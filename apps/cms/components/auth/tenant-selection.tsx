@@ -88,6 +88,27 @@ function TenantSelection({ tenants, userEmail }: TenantSelectionProps) {
 			</div>
 
 			<form onSubmit={handleSubmit} className="space-y-4">
+				{/* Pagination controls at top */}
+				<div className="flex justify-between gap-4">
+					<Button
+						type="button"
+						onClick={() => handlePageChange(currentPage - 1)}
+						disabled={currentPage === 0}
+						className="flex-1"
+					>
+						← Vorige pagina
+					</Button>
+					<Button
+						type="button"
+						onClick={() => handlePageChange(currentPage + 1)}
+						disabled={currentPage === totalPages - 1}
+						className="flex-1"
+					>
+						Volgende pagina →
+					</Button>
+				</div>
+
+				{/* Tenant list */}
 				<div className="space-y-3">
 					{currentPageTenants.map((tenant) => (
 						<label
@@ -126,41 +147,15 @@ function TenantSelection({ tenants, userEmail }: TenantSelectionProps) {
 					))}
 				</div>
 
-				{/* Pagination controls */}
-				{totalPages > 1 && (
-					<div className="flex justify-between items-center py-4 border-t border-b border-gray-200 bg-gray-50 px-4 rounded-lg">
-						<Button
-							type="button"
-							onClick={() => handlePageChange(currentPage - 1)}
-							disabled={currentPage === 0}
-							className="px-6 py-3 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 hover:bg-gray-100 hover:border-gray-400 disabled:text-gray-400 disabled:bg-gray-100 shadow-sm"
-							title="← Vorige pagina"
-						/>
-						<div className="text-center">
-							<span className="text-sm font-medium text-gray-700">
-								Pagina {currentPage + 1} van {totalPages}
-							</span>
-							<div className="text-xs text-gray-500 mt-1">
-								Jaar{currentPageYears.length > 1 ? 'gangen' : ''}: {currentPageYears.join(', ')}
-							</div>
-						</div>
-						<Button
-							type="button"
-							onClick={() => handlePageChange(currentPage + 1)}
-							disabled={currentPage === totalPages - 1}
-							className="px-6 py-3 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 hover:bg-gray-100 hover:border-gray-400 disabled:text-gray-400 disabled:bg-gray-100 shadow-sm"
-							title="Volgende pagina →"
-						/>
-					</div>
-				)}
-
+				{/* Fullwidth confirm button */}
 				<Button
 					type="submit"
-					className="w-full"
-					title="Continue"
+					className="w-full py-3 text-lg font-semibold"
 					isLoading={isPending}
 					disabled={!selectedTenantId}
-				/>
+				>
+					{isPending ? 'Bezig...' : 'Bevestigen'}
+				</Button>
 			</form>
 		</div>
 	)
