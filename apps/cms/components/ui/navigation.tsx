@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HiHome, HiMiniArrowRightOnRectangle, HiUsers } from "react-icons/hi2";
+import { Home, LogOut, Users, UserRoundCog } from 'lucide-react'
 
 import { logout } from "@/server/auth/actions";
 import { cn } from "@/utils";
+// replaced react-icons with lucide-react for a cleaner, lightweight set
 
 interface NavigationProps {
   user: {
@@ -30,7 +31,7 @@ function NavigationItem({ href, active, label, icon }: NavigationItemProps) {
       <Link
         href={href}
         className={cn(
-          "flex items-center space-x-3 rounded-ui px-3.5 py-2.5 text-sm font-medium transition-all duration-75",
+          "flex items-center space-x-3 rounded-[10px] px-3.5 py-2.5 text-sm font-medium transition-all duration-75",
           active
             ? "bg-neutral-200"
             : "text-neutral-600 hover:bg-neutral-200 hover:text-base-black",
@@ -46,13 +47,10 @@ function NavigationItem({ href, active, label, icon }: NavigationItemProps) {
 function Navigation({ user }: NavigationProps) {
   const pathname = usePathname();
 
-  // Determine home path based on user role
-  const homePath = user.role === "ADMIN" ? "/admin" : "/editor";
-
   return (
     <header className="flex h-full w-64 shrink-0 flex-col justify-between pb-4 pl-2.5 pt-2.5">
       <div>
-        <button className="mb-2.5 flex w-full items-center justify-between rounded-ui p-3">
+        <button className="mb-2.5 flex w-full items-center justify-between rounded-[10px] p-3">
           <div className="flex items-center space-x-2">
             <div className="flex h-6 w-6 items-center justify-center">
 
@@ -64,27 +62,35 @@ function Navigation({ user }: NavigationProps) {
 
         <ul className="mb-6 space-y-px">
           <NavigationItem
-            href={homePath}
-            active={pathname === homePath}
+            href="/"
+            active={pathname === "/"}
             label="Home"
-            icon={<HiHome size={18} />}
+            icon={<Home size={18} />}
           />
           {user.role === "ADMIN" && (
             <NavigationItem
-              href="/admin/users"
-              active={pathname === "/admin/users"}
-              label="User Management"
-              icon={<HiUsers size={18} />}
+              href="/admin"
+              active={pathname === "/admin"}
+              label="Admin"
+              icon={<UserRoundCog size={18} />}
+            />
+          )}
+          {(user.role === "ADMIN" || user.role === "EDITOR") && (
+            <NavigationItem
+              href="/editor"
+              active={pathname === "/editor"}
+              label="Editor"
+              icon={<Users size={18} />}
             />
           )}
         </ul>
       </div>
       <div>
         <div className="mb-2.5">
-          {/* @ts-ignore */}
+          {/* @ts-expect-error */}
           <form action={logout}>
-            <button className="flex w-full items-center space-x-3 rounded-ui px-3.5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-75">
-              <HiMiniArrowRightOnRectangle size={18} />
+            <button className="flex w-full items-center space-x-3 rounded-[10px] px-3.5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-75">
+              <LogOut size={18} />
               <span>Logout</span>
             </button>
           </form>
@@ -99,7 +105,7 @@ function Navigation({ user }: NavigationProps) {
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-900 font-semibold capitalize text-white">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-900 font-semibold capitalize text-black">
                   {user.givenName[0]}
                 </div>
               )}

@@ -28,7 +28,7 @@ function Dropdown({ trigger, items, align }: DropdownProps) {
           {items.map((item, i) => (
             <RadixDropdown.DropdownMenuItem
               className={cn(
-                "cursor-pointer rounded-ui px-3 py-2 focus:outline-none",
+                "cursor-pointer rounded-[8px] px-3 py-2 focus:outline-none",
                 item.isDanger
                   ? "text-red-600 focus:bg-red-50"
                   : "focus:bg-neutral-100",

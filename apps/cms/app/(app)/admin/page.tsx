@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 
 import { validateRequest } from "@/server/auth/validate"
-import { ButtonLink } from "@/components/ui"
+import Link from "next/link"
 
 async function AdminPage() {
 	const { user } = await validateRequest()
@@ -24,29 +24,19 @@ async function AdminPage() {
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-				<div className="rounded-ui border border-neutral-200 bg-white p-6">
+				<Link href="/admin/users" className="rounded-[8px] border border-neutral-200 bg-white p-6">
 					<h2 className="text-lg font-semibold mb-2">User Management</h2>
 					<p className="text-neutral-600 mb-4">
 						Manage user accounts, roles, and permissions across the platform.
 					</p>
-					<ButtonLink 
-						href="/admin/users" 
-						title="Manage Users" 
-						variant="primary"
-					/>
-				</div>
+				</Link>
 
-				<div className="rounded-ui border border-neutral-200 bg-white p-6">
+				<Link href="/admin/health" className="rounded-[8px] border border-neutral-200 bg-white p-6">
 					<h2 className="text-lg font-semibold mb-2">System Overview</h2>
 					<p className="text-neutral-600 mb-4">
 						View system statistics and monitor platform health.
 					</p>
-					<ButtonLink 
-						href="/admin/system" 
-						title="View System" 
-						variant="secondary-gray"
-					/>
-				</div>
+				</Link>
 			</div>
 		</div>
 	)

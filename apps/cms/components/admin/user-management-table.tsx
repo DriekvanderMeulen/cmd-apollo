@@ -10,11 +10,12 @@ import { updateUserRole, deleteUser, suspendUserSessions, type UserWithSessionCo
 import { cn } from "@/utils"
 
 interface UserManagementTableProps {
-	users: UserWithSessionCount[]
-	searchTerm?: string
-	sortBy?: "name" | "email" | "role"
-	sortOrder?: "asc" | "desc"
-	roleFilter?: "ADMIN" | "EDITOR" | "USER"
+    users: UserWithSessionCount[]
+    searchTerm?: string
+    sortBy?: "name" | "email" | "role"
+    sortOrder?: "asc" | "desc"
+    roleFilter?: "ADMIN" | "EDITOR" | "USER"
+    page?: number
 }
 
 interface UserRowProps {
@@ -23,7 +24,7 @@ interface UserRowProps {
 
 const roleColors = {
 	ADMIN: "bg-red-100 text-red-800",
-	EDITOR: "bg-blue-100 text-blue-800", 
+	EDITOR: "bg-yellow-100 text-yellow-800", 
 	USER: "bg-gray-100 text-gray-800",
 }
 
@@ -116,7 +117,7 @@ function UserRow({ user }: UserRowProps) {
 							referrerPolicy="no-referrer"
 						/>
 					) : (
-						<div className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-900 font-semibold capitalize text-white">
+						<div className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-900 font-semibold capitalize text-black">
 							{user.givenName?.[0] || user.email[0]}
 						</div>
 					)}
@@ -161,7 +162,7 @@ function UserRow({ user }: UserRowProps) {
 					<Dropdown
 						trigger={
 							<button 
-								className="p-1 hover:bg-neutral-100 rounded-ui disabled:opacity-50"
+								className="p-1 hover:bg-neutral-100  cursor-pointer rounded-[8px] disabled:opacity-50"
 								disabled={isPending}
 							>
 								{isPending && activeAction ? (
@@ -183,17 +184,18 @@ function UserRow({ user }: UserRowProps) {
 }
 
 export function UserManagementTable({ 
-	users, 
-	searchTerm, 
-	sortBy, 
-	sortOrder, 
-	roleFilter 
+    users, 
+    searchTerm, 
+    sortBy, 
+    sortOrder, 
+    roleFilter,
+    page = 1,
 }: UserManagementTableProps) {
 	const router = useRouter()
 	const searchParams = useSearchParams()
 	const [searchInput, setSearchInput] = useState(searchTerm || "")
 
-	const updateUrl = (key: string, value: string | null) => {
+    const updateUrl = (key: string, value: string | null) => {
 		const params = new URLSearchParams(searchParams.toString())
 		if (value) {
 			params.set(key, value)
@@ -203,9 +205,10 @@ export function UserManagementTable({
 		router.push(`/admin/users?${params.toString()}`)
 	}
 
-	const handleSearch = (e: React.FormEvent) => {
+    const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault()
-		updateUrl("q", searchInput || null)
+        updateUrl("q", searchInput || null)
+        updateUrl("page", "1")
 	}
 
 	const handleSort = (column: "name" | "email" | "role") => {
@@ -213,7 +216,8 @@ export function UserManagementTable({
 		const params = new URLSearchParams(searchParams.toString())
 		params.set("sort", column)
 		params.set("order", newOrder)
-		router.push(`/admin/users?${params.toString()}`)
+        params.set("page", "1")
+        router.push(`/admin/users?${params.toString()}`)
 	}
 
 	const getSortIcon = (column: "name" | "email" | "role") => {
@@ -222,6 +226,9 @@ export function UserManagementTable({
 			? <HiChevronUp size={16} className="text-neutral-700" />
 			: <HiChevronDown size={16} className="text-neutral-700" />
 	}
+
+    const pageNum = page
+    const setPage = (p: number) => updateUrl("page", String(p))
 
 	return (
 		<div className="space-y-4">
@@ -235,7 +242,7 @@ export function UserManagementTable({
 						type="search"
 						value={searchInput}
 						onChange={(e) => setSearchInput(e.target.value)}
-						className="h-11 w-80 rounded-ui pl-10 pr-3.5 border border-neutral-200 outline-offset-0 outline-neutral-950 placeholder:text-neutral-400"
+						className="h-11 w-80 rounded-[8px] pl-10 pr-3.5 border border-neutral-200 outline-offset-0 outline-neutral-950 placeholder:text-neutral-400"
 						placeholder="Search users..."
 					/>
 				</form>
@@ -244,7 +251,7 @@ export function UserManagementTable({
 					<select
 						value={roleFilter || ""}
 						onChange={(e) => updateUrl("role", e.target.value || null)}
-						className="h-11 rounded-ui px-3 border border-neutral-200 outline-offset-0 outline-neutral-950"
+						className="h-11 rounded-[8px] px-3 border border-neutral-200 outline-offset-0 outline-neutral-950"
 					>
 						<option value="">All Roles</option>
 						<option value="ADMIN">Admin</option>
@@ -255,7 +262,7 @@ export function UserManagementTable({
 			</div>
 
 			{/* Table */}
-			<div className="overflow-hidden rounded-ui border border-neutral-200 bg-white">
+			<div className="overflow-hidden rounded-[8px] border border-neutral-200 bg-white">
 				<table className="min-w-full">
 					<thead className="bg-neutral-50">
 						<tr>
@@ -310,7 +317,7 @@ export function UserManagementTable({
 					Showing {users.length} user{users.length !== 1 ? 's' : ''}
 					{(searchTerm || roleFilter) && " matching your criteria"}
 				</span>
-				<div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-4">
 					<span>
 						{users.filter(u => u.role === "ADMIN").length} Admin{users.filter(u => u.role === "ADMIN").length !== 1 ? 's' : ''}
 					</span>
@@ -322,6 +329,17 @@ export function UserManagementTable({
 					</span>
 				</div>
 			</div>
+
+            {/* Pagination */}
+            <div className="flex items-center justify-end gap-2">
+                <button className="p-1 rounded-[8px] hover:bg-neutral-100 cursor-pointer disabled:opacity-50" onClick={() => setPage(Math.max(1, pageNum - 1))} disabled={pageNum <= 1}>
+                    Prev
+                </button>
+                <span className="text-sm">Page {pageNum}</span>
+                <button className="p-1 rounded-[8px] hover:bg-neutral-100 cursor-pointer disabled:opacity-50" onClick={() => setPage(pageNum + 1)}>
+                    Next
+                </button>
+            </div>
 		</div>
 	)
 }

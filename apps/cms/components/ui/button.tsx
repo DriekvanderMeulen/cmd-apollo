@@ -21,14 +21,18 @@ interface ButtonLinkProps extends LinkProps, BaseButtonProps {
 }
 
 const variants = cva(
-  "h-11 rounded-ui font-bold transition-all duration-100 px-5 justify-center space-x-3 inline-flex items-center font-semibold leading-11",
+  "h-11 rounded-[10px] transition-colors duration-150 px-5 justify-center space-x-3 inline-flex items-center font-semibold leading-11 border border-transparent",
   {
     variants: {
       variant: {
-        primary: "text-white bg-primary",
-        secondary: "text-black bg-white",
-        "secondary-gray": "text-black bg-neutral-100",
-        danger: "text-white bg-red-600",
+        primary:
+          "text-white bg-primary hover:brightness-95 active:brightness-90",
+        secondary:
+          "text-base-black bg-white border-neutral-200 hover:bg-neutral-100",
+        "secondary-gray":
+          "text-base-black bg-neutral-100 border-neutral-200 hover:bg-neutral-200",
+        danger:
+          "text-white bg-red-600 hover:bg-red-700 active:bg-red-800",
       },
     },
     defaultVariants: {
@@ -44,13 +48,18 @@ export function Button({
   iconLeft,
   iconRight,
   isLoading,
+  children,
+  disabled,
   ...props
-}: ButtonProps) {
+}: ButtonProps & { children?: React.ReactNode }) {
+  const content = title ?? children;
+  const derivedAriaLabel =
+    title ?? (typeof content === "string" ? (content as string) : undefined);
   return (
     <button
-      disabled={isLoading}
+      disabled={isLoading || disabled}
       aria-busy={isLoading}
-      aria-label={title}
+      aria-label={derivedAriaLabel}
       {...props}
       className={cn(
         variants({ variant }),
@@ -60,7 +69,7 @@ export function Button({
     >
       {isLoading && <Spinner size={20} />}
       {!isLoading && iconLeft ? iconLeft : null}
-      <span>{title}</span>
+      {content ? <span>{content}</span> : null}
       {iconRight}
     </button>
   );
@@ -72,16 +81,20 @@ export function ButtonLink({
   className,
   iconLeft,
   iconRight,
+  children,
   ...props
-}: ButtonLinkProps) {
+}: ButtonLinkProps & { children?: React.ReactNode }) {
+  const content = title ?? children;
   return (
     <Link
       {...props}
-      aria-label={title}
+      aria-label={
+        typeof content === "string" ? (content as string) : undefined
+      }
       className={cn(variants({ variant }), className)}
     >
       {iconLeft ? iconLeft : null}
-      <span>{title}</span>
+      {content ? <span>{content}</span> : null}
       {iconRight}
     </Link>
   );

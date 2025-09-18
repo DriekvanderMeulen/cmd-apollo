@@ -20,7 +20,7 @@ async function AppLayout({ children }: AppLayoutProps) {
       <div className="relative z-10 flex h-full overflow-hidden">
         <Navigation user={user} />
         <div className="min-h-full grow overflow-y-scroll pb-8">
-          <main className="wrapper flex min-h-full flex-col">{children}</main>
+          <main className="wrapper pt-16 flex min-h-full flex-col">{children}</main>
         </div>
       </div>
       <Toaster

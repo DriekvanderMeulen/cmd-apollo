@@ -57,7 +57,7 @@ function Search() {
           setIsSearching(true);
           setInput(e.target.value);
         }}
-        className="h-11 w-80 rounded-ui pl-10 pr-3.5 outline-offset-0 outline-neutral-950 placeholder:text-neutral-400"
+        className="h-11 w-80 rounded-[8px] pl-10 pr-3.5 outline-offset-0 outline-neutral-950 placeholder:text-neutral-400"
         placeholder="Search…"
       />
     </div>

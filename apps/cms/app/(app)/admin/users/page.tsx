@@ -10,6 +10,7 @@ interface AdminUsersPageProps {
 		sort?: "name" | "email" | "role"
 		order?: "asc" | "desc" 
 		role?: "ADMIN" | "EDITOR" | "USER"
+		page?: string
 	}>
 }
 
@@ -25,11 +26,14 @@ async function AdminUsersPage({ searchParams }: AdminUsersPageProps) {
 	}
 
 	const params = await searchParams
+	const page = params.page ? Number(params.page) : 1
 	const users = await getAllUsers(
 		params.q,
 		params.sort,
 		params.order,
-		params.role
+		params.role,
+		page,
+		6,
 	)
 
 	return (
@@ -47,6 +51,7 @@ async function AdminUsersPage({ searchParams }: AdminUsersPageProps) {
 				sortBy={params.sort}
 				sortOrder={params.order}
 				roleFilter={params.role}
+				page={page}
 			/>
 		</div>
 	)

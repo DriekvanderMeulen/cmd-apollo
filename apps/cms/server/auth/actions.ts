@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
+import { env } from "@/env";
 import { tenantTable, userTable, oAuthAccountsTable } from "@/db/schema";
 import { lucia } from "@/server/auth";
 import { validateRequest } from "@/server/auth/validate";
@@ -92,10 +93,14 @@ export async function getAvailableTenants() {
   }
 }
 
-export async function completeTenantRegistration(tenantId: number): Promise<ActionResult> {
+export async function completeTenantRegistration(tenantId: number, authString: string): Promise<ActionResult> {
   const cookieStore = await cookies();
   
   try {
+    // Validate auth string for first-time registration
+    if (!authString || authString !== env.AUTH_STRING) {
+      return { error: "Ongeldige autorisatiesleutel" };
+    }
     // Get pending user data from cookies
     const pendingUserDataCookie = cookieStore.get("pending_user_data");
     

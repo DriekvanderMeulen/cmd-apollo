@@ -26,7 +26,7 @@ function SignInWithGoogle() {
       title="Sign in with Google"
       isLoading={isLoading}
       variant="secondary-gray"
-      className="w-full"
+      className="w-full border-black border cursor-pointer"
     />
   );
 }

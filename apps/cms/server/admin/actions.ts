@@ -25,7 +25,14 @@ export interface UserWithSessionCount {
 	sessionCount: number
 }
 
-export async function getAllUsers(searchTerm?: string, sortBy?: "name" | "email" | "role", sortOrder?: "asc" | "desc", roleFilter?: "ADMIN" | "EDITOR" | "USER"): Promise<UserWithSessionCount[]> {
+export async function getAllUsers(
+  searchTerm?: string,
+  sortBy?: "name" | "email" | "role",
+  sortOrder?: "asc" | "desc",
+  roleFilter?: "ADMIN" | "EDITOR" | "USER",
+  page: number = 1,
+  pageSize: number = 10,
+): Promise<UserWithSessionCount[]> {
 	const { user } = await validateRequest()
 	
 	if (!user) {
@@ -88,8 +95,9 @@ export async function getAllUsers(searchTerm?: string, sortBy?: "name" | "email"
 		orderBy = [asc(userTable.givenName), asc(userTable.familyName)]
 	}
 
-	// Execute query
-	let queryBuilder = db
+    // Execute query
+    const offset = Math.max(0, (page - 1) * pageSize)
+    let queryBuilder = db
 		.select({
 			id: userTable.id,
 			publicId: userTable.publicId,
@@ -107,8 +115,8 @@ export async function getAllUsers(searchTerm?: string, sortBy?: "name" | "email"
 		queryBuilder = queryBuilder.where(whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions))
 	}
 
-	// @ts-ignore - Drizzle ORM type complexity
-	const users = await queryBuilder.orderBy(...orderBy)
+    // @ts-ignore - Drizzle ORM type complexity
+    const users = await queryBuilder.orderBy(...orderBy).limit(pageSize).offset(offset)
 
 	// Get session counts for each user
 	const usersWithSessionCount = await Promise.all(

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
 
@@ -20,10 +20,12 @@ interface TenantSelectionProps {
 function TenantSelection({ tenants, userEmail }: TenantSelectionProps) {
 	const [selectedTenantId, setSelectedTenantId] = useState<number | null>(null)
 	const [currentPage, setCurrentPage] = useState(0)
-	const [isPending, startTransition] = useTransition()
+	const [isSubmitting, setIsSubmitting] = useState(false)
 	const router = useRouter()
+	const [authString, setAuthString] = useState('')
+	const [authError, setAuthError] = useState<string | null>(null)
 
-	const TENANTS_PER_PAGE = 6
+	const TENANTS_PER_PAGE = 3
 
 	// Extract year from tenant name (format: CMD-[A-C]-[YYYY])
 	const extractYear = (name: string): number => {
@@ -51,31 +53,56 @@ function TenantSelection({ tenants, userEmail }: TenantSelectionProps) {
 	}, [tenants, currentPage])
 
 	const handlePageChange = (newPage: number) => {
-		setCurrentPage(newPage)
+		// Clamp within bounds to avoid empty pages
+		setCurrentPage((prev) => {
+			const next = Math.max(0, Math.min(newPage, totalPages - 1))
+			return next
+		})
 	}
+
+	// If tenants change or pages shrink, keep currentPage within bounds
+	useEffect(() => {
+		setCurrentPage((prev) => {
+			const maxIndex = Math.max(0, totalPages - 1)
+			return Math.min(prev, maxIndex)
+		})
+	}, [totalPages])
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
+		setAuthError(null)
 		
 		if (!selectedTenantId) {
 			toast.error('Please select a tenant to continue')
 			return
 		}
 
-		startTransition(async () => {
-			try {
-				const result = await completeTenantRegistration(selectedTenantId)
-				
-				if (result.error) {
-					toast.error(result.error)
+		if (!authString) {
+			setAuthError('Voer de autorisatiesleutel in')
+			toast.error('Voer de autorisatiesleutel in')
+			return
+		}
+
+		setIsSubmitting(true)
+		try {
+			const result = await completeTenantRegistration(selectedTenantId, authString)
+			
+			if (result.error) {
+				// Show inline error for invalid auth key; toast for other errors
+				if (result.error.toLowerCase().includes('autorisatiesleutel')) {
+					setAuthError(result.error)
 				} else {
-					toast.success('Registration completed successfully!')
-					router.push('/')
+					toast.error(result.error)
 				}
-			} catch (error) {
-				toast.error('Something went wrong. Please try again.')
+			} else {
+				toast.success('Registration completed successfully!')
+				router.push('/')
 			}
-		})
+		} catch (error) {
+			toast.error('Something went wrong. Please try again.')
+		} finally {
+			setIsSubmitting(false)
+		}
 	}
 
 	return (
@@ -94,17 +121,17 @@ function TenantSelection({ tenants, userEmail }: TenantSelectionProps) {
 						type="button"
 						onClick={() => handlePageChange(currentPage - 1)}
 						disabled={currentPage === 0}
-						className="flex-1"
+						className="flex-1 text-sm cursor-pointer"
 					>
-						← Vorige pagina
+						← Vorige
 					</Button>
 					<Button
 						type="button"
 						onClick={() => handlePageChange(currentPage + 1)}
 						disabled={currentPage === totalPages - 1}
-						className="flex-1"
+						className="flex-1 text-sm cursor-pointer"
 					>
-						Volgende pagina →
+						Volgende →
 					</Button>
 				</div>
 
@@ -113,9 +140,9 @@ function TenantSelection({ tenants, userEmail }: TenantSelectionProps) {
 					{currentPageTenants.map((tenant) => (
 						<label
 							key={tenant.id}
-							className={`block cursor-pointer rounded-ui border-2 p-4 transition-colors ${
+							className={`block cursor-pointer rounded-[8px] border-2 p-4 transition-colors ${
 								selectedTenantId === tenant.id
-									? 'border-blue-500 bg-blue-50'
+									? 'border-yellow-500 bg-yellow-50'
 									: 'border-gray-200 hover:border-gray-300'
 							}`}
 						>
@@ -132,13 +159,13 @@ function TenantSelection({ tenants, userEmail }: TenantSelectionProps) {
 								<div
 									className={`h-4 w-4 rounded-full border-2 ${
 										selectedTenantId === tenant.id
-											? 'border-blue-500 bg-blue-500'
+											? 'border-yellow-500 bg-yellow-500'
 											: 'border-gray-300'
 									}`}
 								>
 									{selectedTenantId === tenant.id && (
 										<div className="h-full w-full rounded-full bg-white p-0.5">
-											<div className="h-full w-full rounded-full bg-blue-500" />
+											<div className="h-full w-full rounded-full bg-yellow-500" />
 										</div>
 									)}
 								</div>
@@ -148,14 +175,31 @@ function TenantSelection({ tenants, userEmail }: TenantSelectionProps) {
 				</div>
 
 				{/* Fullwidth confirm button */}
-				<Button
-					type="submit"
-					className="w-full py-3 text-lg font-semibold"
-					isLoading={isPending}
-					disabled={!selectedTenantId}
-				>
-					{isPending ? 'Bezig...' : 'Bevestigen'}
-				</Button>
+				<div className="space-y-3">
+				<input
+						type="password"
+						value={authString}
+					onChange={(e) => {
+						setAuthError(null)
+						setAuthString(e.target.value)
+					}}
+						placeholder="Autorisatiesleutel"
+					className={`w-full rounded-[8px] border p-3 ${authError ? 'border-red-500 focus:outline-red-600' : 'border-gray-300'}`}
+					aria-invalid={authError ? 'true' : 'false'}
+						autoComplete="off"
+					/>
+				{authError ? (
+					<p className="text-sm text-red-600">{authError}</p>
+				) : null}
+					<Button
+						type="submit"
+					className="w-full border-black border cursor-pointer py-3 text-lg font-semibold"
+					isLoading={isSubmitting}
+						disabled={!selectedTenantId}
+					>
+					{isSubmitting ? 'Bezig...' : 'Bevestigen'}
+					</Button>
+				</div>
 			</form>
 		</div>
 	)
