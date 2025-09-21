@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import { ThemedView } from '@/components/themed-view'
+import { ThemedText } from '@/components/themed-text'
 
 type CameraModule = {
 	CameraView: any
@@ -50,7 +51,7 @@ export default function CameraScreen() {
 	if (!cameraMod) {
 		return (
 			<ThemedView className="flex-1 items-center justify-center">
-				<Text>Loading camera…</Text>
+				<ThemedText>Loading camera…</ThemedText>
 			</ThemedView>
 		)
 	}
@@ -58,7 +59,7 @@ export default function CameraScreen() {
 	if (!available || permission !== 'granted') {
 		return (
 			<ThemedView className="flex-1 items-center justify-center">
-				<Text>Camera not available or permission denied.</Text>
+				<ThemedText>Camera not available or permission denied.</ThemedText>
 			</ThemedView>
 		)
 	}

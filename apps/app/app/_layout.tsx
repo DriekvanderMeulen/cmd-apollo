@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 import { AppThemeProvider, useAppTheme } from '@/components/app-theme-provider'
+import { R2CacheProvider } from '@/components/r2-cache-provider'
 import { verifyInstallation } from 'nativewind';
 import './global.css';
 import { getMe } from '@/lib/auth';
@@ -72,7 +73,9 @@ function LayoutInner() {
 export default function RootLayout() {
   return (
     <AppThemeProvider>
-      <LayoutInner />
+      <R2CacheProvider>
+        <LayoutInner />
+      </R2CacheProvider>
     </AppThemeProvider>
   )
 }
