@@ -4,17 +4,20 @@ import { generateCodeVerifier, generateState } from "arctic";
 import { Google } from "arctic";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { randomBytes } from "crypto";
 
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { env } from "@/env";
 import { tenantTable, userTable, oAuthAccountsTable } from "@/db/schema";
+import { appCodes } from "@/db/schema/appCodes";
 import { lucia } from "@/server/auth";
 import { validateRequest } from "@/server/auth/validate";
 
-interface ActionResult { 
+interface ActionResult {
   error: string | null;
+  deepLink?: string | null;
 }
 
 export async function logout(): Promise<ActionResult> {
@@ -153,7 +156,25 @@ export async function completeTenantRegistration(tenantId: number, authString: s
     // Clear pending user data
     cookieStore.delete("pending_user_data");
 
-    return { error: null };
+    // If registration was initiated from the app, mint a one-time code and deep link back
+    const appRedirect = cookieStore.get("app_redirect")?.value || null;
+    if (appRedirect) {
+      const codeForApp = randomBytes(32).toString("hex");
+      const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+      await db.insert(appCodes).values({
+        code: codeForApp,
+        userId,
+        expiresAt,
+      });
+      // single use cookie
+      cookieStore.delete("app_redirect");
+
+      const deepLink = new URL(appRedirect);
+      deepLink.searchParams.set("code", codeForApp);
+      return { error: null, deepLink: deepLink.toString() };
+    }
+
+    return { error: null, deepLink: null };
   } catch (error) {
     console.error("Registration error:", error);
     return { error: "Failed to complete registration. Please try again." };

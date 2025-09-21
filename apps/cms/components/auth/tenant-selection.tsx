@@ -85,7 +85,7 @@ function TenantSelection({ tenants, userEmail }: TenantSelectionProps) {
 
 		setIsSubmitting(true)
 		try {
-			const result = await completeTenantRegistration(selectedTenantId, authString)
+            const result = await completeTenantRegistration(selectedTenantId, authString)
 			
 			if (result.error) {
 				// Show inline error for invalid auth key; toast for other errors
@@ -94,10 +94,14 @@ function TenantSelection({ tenants, userEmail }: TenantSelectionProps) {
 				} else {
 					toast.error(result.error)
 				}
-			} else {
-				toast.success('Registration completed successfully!')
-				router.push('/')
-			}
+            } else {
+                toast.success('Registration completed successfully!')
+                if (result.deepLink) {
+                    window.location.href = result.deepLink
+                    return
+                }
+                router.push('/')
+            }
 		} catch (error) {
 			toast.error('Something went wrong. Please try again.')
 		} finally {

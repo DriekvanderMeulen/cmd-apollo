@@ -1,6 +1,7 @@
 import {
 	index,
 	int,
+	datetime,
 	mysqlTable,
 	text,
 	unique,
@@ -11,6 +12,7 @@ import { nanoid } from '../id'
 import { categoryTable } from './category'
 import { collectionTable } from './collection'
 import { userTable } from './user'
+import { sql } from 'drizzle-orm'
 
 export const objectTable = mysqlTable(
 	'objects',
