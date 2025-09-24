@@ -6,7 +6,7 @@ import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import { db } from '@/db'
 import { objectTable } from '@/db/schema'
 import { validateRequest } from '@/server/auth/validate'
-import { R2_BUCKET_NAME, createR2Client } from '@/server/clients/r2'
+import { R2_BUCKET_NAME, R2_BUCKET, createR2Client } from '@/server/clients/r2'
 
 function buildKey(basePath: string | null, collectionId: number, userId: number, objectId: number, iteration: number) {
   // Prefer stored base up to userId if present; else fallback to collection/object
@@ -26,8 +26,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const obj = rows[0]
   if (!obj) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const form = await req.formData().catch(() => null)
-  const file = form?.get('file') as File | null
+  let form: any
+  try {
+    form = await req.formData()
+  } catch {
+    return NextResponse.json({ error: 'Invalid form data' }, { status: 400 })
+  }
+  const file = form.get('file') as File | null
   if (!file) return NextResponse.json({ error: 'File is required' }, { status: 400 })
   const client = createR2Client()
   const arrayBuffer = await file.arrayBuffer()

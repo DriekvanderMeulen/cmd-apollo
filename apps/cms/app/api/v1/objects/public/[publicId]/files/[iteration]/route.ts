@@ -25,8 +25,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pub
   const obj = rows[0]
   if (!obj) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const form = await req.formData().catch(() => null)
-  const file = form?.get('file') as File | null
+  let form: any
+  try {
+    form = await req.formData()
+  } catch {
+    return NextResponse.json({ error: 'Invalid form data' }, { status: 400 })
+  }
+  const file = form.get('file') as File | null
   if (!file) return NextResponse.json({ error: 'File is required' }, { status: 400 })
   const client = createR2Client()
   const arrayBuffer = await file.arrayBuffer()

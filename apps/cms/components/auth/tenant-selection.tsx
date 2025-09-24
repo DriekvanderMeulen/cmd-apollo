@@ -197,7 +197,7 @@ function TenantSelection({ tenants, userEmail }: TenantSelectionProps) {
 				) : null}
 					<Button
 						type="submit"
-					className="w-full border-black border cursor-pointer py-3 text-lg font-semibold"
+					className="w-full border-black text-black border cursor-pointer py-3 text-lg font-semibold"
 					isLoading={isSubmitting}
 						disabled={!selectedTenantId}
 					>

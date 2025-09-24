@@ -14,17 +14,19 @@ export function getRedirectUri(): string {
 export function getCmsOrigin(): string {
 	const configured = process.env.EXPO_PUBLIC_CMS_ORIGIN
 	if (configured && configured.length > 0) return configured
-	return __DEV__ ? 'http://localhost:3000' : 'https://cms.apolloview.app'
+	// return __DEV__ ? 'http://localhost:3000' : 'https://cms.apolloview.app'
+	return 'https://cms.apolloview.app'
 }
 
 export async function signIn(): Promise<void> {
 	const redirectUri = getRedirectUri()
 	const cms = getCmsOrigin()
 
-	const { type, url } = await WebBrowser.openAuthSessionAsync(
+	const result = await WebBrowser.openAuthSessionAsync(
 		`${cms}/api/v1/auth/oauth/start?redirect_uri=${encodeURIComponent(redirectUri)}`,
 		redirectUri
 	)
+	const { type, url } = { type: result.type, url: (result as any).url }
 
 	if (type !== 'success' || !url) return
 

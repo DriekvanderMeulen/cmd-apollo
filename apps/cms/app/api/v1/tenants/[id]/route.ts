@@ -11,7 +11,7 @@ function requireEditorOrAdmin(role: "ADMIN" | "EDITOR" | "USER") {
     }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { user } = await validateRequest()
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     try {
@@ -20,7 +20,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    const id = Number(params.id)
+    const { id: idStr } = await params
+  const id = Number(idStr)
     if (!Number.isFinite(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 })
     const body = await req.json().catch(() => null)
     const name = body?.name?.trim()
@@ -29,7 +30,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     return NextResponse.json({ ok: true })
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { user } = await validateRequest()
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     try {
@@ -38,7 +39,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
         return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    const id = Number(params.id)
+    const { id: idStr } = await params
+  const id = Number(idStr)
     if (!Number.isFinite(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 })
     await db.delete(tenantTable).where(eq(tenantTable.id, id))
     return NextResponse.json({ ok: true })

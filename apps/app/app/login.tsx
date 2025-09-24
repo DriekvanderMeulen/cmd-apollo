@@ -14,6 +14,8 @@ export default function LoginScreen() {
 		setLoading(true)
 		try {
 			await signIn()
+			// Small delay to ensure token is properly stored before navigation
+			await new Promise(resolve => setTimeout(resolve, 100))
 			// navigate into app after successful sign-in
 			router.replace('/(tabs)')
 		} finally {

@@ -7,10 +7,10 @@ import { collectionTable, objectTable } from "@/db/schema"
 import { validateRequest } from "@/server/auth/validate"
 import { R2_BUCKET_NAME, createR2Client } from "@/server/clients/r2"
 
-export async function GET(_req: NextRequest, { params }: { params: { publicId: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ publicId: string }> }) {
   const { user } = await validateRequest()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const publicId = params.publicId
+  const { publicId } = await params
   if (!publicId) return NextResponse.json({ error: "Invalid publicId" }, { status: 400 })
   const rows = await db
     .select({
@@ -32,10 +32,10 @@ export async function GET(_req: NextRequest, { params }: { params: { publicId: s
   return NextResponse.json(obj)
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { publicId: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ publicId: string }> }) {
   const { user } = await validateRequest()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const publicId = params.publicId
+  const { publicId } = await params
   if (!publicId) return NextResponse.json({ error: "Invalid publicId" }, { status: 400 })
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: "Invalid body" }, { status: 400 })
@@ -54,10 +54,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { publicId: 
   return NextResponse.json({ ok: true })
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { publicId: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ publicId: string }> }) {
   const { user } = await validateRequest()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const publicId = params.publicId
+  const { publicId } = await params
   if (!publicId) return NextResponse.json({ error: "Invalid publicId" }, { status: 400 })
   const rows = await db.select().from(objectTable).where(and(eq(objectTable.publicId, publicId), eq(objectTable.userId, user.id)))
   const obj = rows[0]

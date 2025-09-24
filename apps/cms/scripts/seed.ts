@@ -4,7 +4,11 @@ import { config } from 'dotenv'
 import path from 'path'
 
 // Load environment variables from .env BEFORE importing db
-config({ path: path.join(__dirname, '..', '.env') })
+try {
+  config({ path: path.join(__dirname, '..', '.env') })
+} catch (error) {
+  console.warn('Could not load .env file:', error)
+}
 
 import { eq } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/mysql2'

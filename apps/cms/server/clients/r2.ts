@@ -41,5 +41,6 @@ function normalizeBucket(input: string): string {
 }
 
 export const R2_BUCKET_NAME = normalizeBucket(env.CF_R2_BUCKET)
+export const R2_BUCKET = R2_BUCKET_NAME
 
 

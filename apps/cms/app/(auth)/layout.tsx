@@ -1,7 +1,6 @@
 import Link from "next/link";
-import type { PropsWithChildren } from "react";
 
-function AuthLayout({ children }: PropsWithChildren<{}>) {
+function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-full w-full flex-col items-center justify-between">
       <div className="flex h-16 w-full items-center px-6 text-xl font-bold">

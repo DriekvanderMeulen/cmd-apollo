@@ -8,16 +8,21 @@ import { objectTable } from '@/db/schema'
 import { validateRequest } from '@/server/auth/validate'
 import { R2_BUCKET, createR2Client } from '@/server/clients/r2'
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { user } = await validateRequest()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const id = Number(params.id)
+  const { id: idStr } = await params
+  const id = Number(idStr)
   const rows = await db.select().from(objectTable).where(and(eq(objectTable.id, id), eq(objectTable.userId, user.id)))
   const obj = rows[0]
   if (!obj) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const form = await req.formData().catch(() => null)
-  if (!form) return NextResponse.json({ error: 'Invalid form' }, { status: 400 })
+  let form: any
+  try {
+    form = await req.formData()
+  } catch {
+    return NextResponse.json({ error: 'Invalid form' }, { status: 400 })
+  }
   const file = form.get('file') as File | null
   if (!file) return NextResponse.json({ error: 'File is required' }, { status: 400 })
 

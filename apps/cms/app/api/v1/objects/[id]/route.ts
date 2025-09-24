@@ -7,10 +7,11 @@ import { objectTable } from "@/db/schema"
 import { validateRequest } from "@/server/auth/validate"
 import { R2_BUCKET_NAME, createR2Client } from "@/server/clients/r2"
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { user } = await validateRequest()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const id = Number(params.id)
+  const { id: idStr } = await params
+  const id = Number(idStr)
   if (!Number.isFinite(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 })
   const rows = await db.select().from(objectTable).where(and(eq(objectTable.id, id), eq(objectTable.userId, user.id)))
   const obj = rows[0]
@@ -18,10 +19,11 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   return NextResponse.json(obj)
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { user } = await validateRequest()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const id = Number(params.id)
+  const { id: idStr } = await params
+  const id = Number(idStr)
   if (!Number.isFinite(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 })
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: "Invalid body" }, { status: 400 })
@@ -35,10 +37,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   return NextResponse.json({ ok: true })
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { user } = await validateRequest()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const id = Number(params.id)
+  const { id: idStr } = await params
+  const id = Number(idStr)
   if (!Number.isFinite(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 })
   const rows = await db.select().from(objectTable).where(and(eq(objectTable.id, id), eq(objectTable.userId, user.id)))
   const obj = rows[0]

@@ -17,11 +17,7 @@ async function LoginPage() {
         <h1 className="mb-1 text-3xl font-bold">Sign in</h1>
         <p className="text-gray-600">Welcome! Please sign in to continue</p>
       </div>
-      {env.NODE_ENV === "development" && (
-        <>
-          <SignInWithGoogle />
-        </>
-      )}
+      <SignInWithGoogle />
     </div>
   );
 }

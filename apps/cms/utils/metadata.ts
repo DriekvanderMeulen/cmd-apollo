@@ -1,6 +1,6 @@
 import { ST } from "next/dist/shared/lib/utils";
 
-import { MetadataTypes } from "@/db";
+type MetadataTypes = "STRING" | "BOOLEAN" | "INT" | "FLOAT" | "DATETIME" | "SINGLE_SELECT";
 
 type MetadataOptions = {
   value: MetadataTypes;

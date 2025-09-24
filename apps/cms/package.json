@@ -9,6 +9,7 @@
     "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:push": "drizzle-kit push",
+    "db:push:railway": "NODE_ENV=production drizzle-kit push",
     "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {

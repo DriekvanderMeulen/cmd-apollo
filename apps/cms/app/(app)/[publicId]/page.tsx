@@ -6,10 +6,10 @@ import { objectTable } from '@/db/schema'
 import { validateRequest } from '@/server/auth'
 import { ObjectDetail } from '@/components/objects/object-detail'
 
-export default async function Page({ params }: { params: { publicId: string } }) {
+export default async function Page({ params }: { params: Promise<{ publicId: string }> }) {
   const { user, session } = await validateRequest()
   if (!user || !session) redirect('/login')
-  const publicId = params.publicId
+  const { publicId } = await params
   if (!publicId) notFound()
   
   // Fetch object data to get the title

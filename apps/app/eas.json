@@ -12,10 +12,16 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_CMS_ORIGIN": "https://cms.apolloview.app"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_CMS_ORIGIN": "https://cms.apolloview.app"
+      }
     }
   },
   "submit": {
