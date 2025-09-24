@@ -7,7 +7,6 @@ import { ActivityIndicator, View } from 'react-native';
 
 import { AppThemeProvider, useAppTheme } from '@/components/app-theme-provider'
 import { R2CacheProvider } from '@/components/r2-cache-provider'
-import { verifyInstallation } from 'nativewind';
 import './global.css';
 import { getMe } from '@/lib/auth';
 
@@ -17,7 +16,6 @@ export const unstable_settings = {
 
 function LayoutInner() {
   const { navigationTheme } = useAppTheme()
-  verifyInstallation();
   const router = useRouter();
   const segments = useSegments();
   const [authChecked, setAuthChecked] = useState(false);

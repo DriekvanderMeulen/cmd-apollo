@@ -12,8 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.apolloview.app",
       "infoPlist": {
-        "NSCameraUsageDescription": "This app needs access to camera to scan and capture objects.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "This app uses the camera to capture photos and scan content."
       }
     },
     "android": {
@@ -27,8 +27,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.apolloview.app",
       "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
+        "CAMERA"
       ]
     },
     "web": {
@@ -38,12 +37,7 @@
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to scan and capture objects."
-        }
-      ],
+
       [
         "expo-splash-screen",
         {
@@ -58,8 +52,7 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": true
     },
     "extra": {
       "router": {},

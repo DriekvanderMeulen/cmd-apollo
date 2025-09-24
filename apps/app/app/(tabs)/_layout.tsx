@@ -24,12 +24,12 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="books.vertical" color={color} />,
         }}
       />
-      {/* 2) Camera in the middle */}
+      {/* 2) Home in the middle */}
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Camera',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="camera.fill" color={color} />,
+          title: 'Home',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       {/* 3) Settings */}
