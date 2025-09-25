@@ -1,9 +1,10 @@
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { useEffect, useState, useCallback } from 'react';
+import { ActivityIndicator, View, AppState } from 'react-native';
 
 import { AppThemeProvider, useAppTheme } from '@/components/app-theme-provider'
 import { R2CacheProvider } from '@/components/r2-cache-provider'
@@ -36,6 +37,41 @@ function LayoutInner() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // Refresh auth when screens gain focus (e.g., after returning from web auth)
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      (async () => {
+        try {
+          const me = await getMe();
+          if (!cancelled) setIsAuthed(Boolean(me?.userId));
+        } catch {
+          if (!cancelled) setIsAuthed(false);
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }, [])
+  );
+
+  // Also refresh auth when app returns to foreground
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        (async () => {
+          try {
+            const me = await getMe();
+            setIsAuthed(Boolean(me?.userId));
+          } catch {
+            setIsAuthed(false);
+          }
+        })();
+      }
+    });
+    return () => sub.remove();
   }, []);
 
   useEffect(() => {

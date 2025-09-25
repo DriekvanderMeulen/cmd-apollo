@@ -1,11 +1,12 @@
 import {
-	index,
-	int,
-	datetime,
-	mysqlTable,
-	text,
-	unique,
-	varchar,
+    index,
+    int,
+    datetime,
+    mysqlTable,
+    text,
+    unique,
+    varchar,
+    boolean,
 } from 'drizzle-orm/mysql-core'
 
 import { nanoid } from '../id'
@@ -36,6 +37,7 @@ export const objectTable = mysqlTable(
 		categoryId: int('category_id')
 			.references(() => categoryTable.id, { onDelete: 'cascade' }),
 		cfR2Link: text('cf_r2_link'),
+        public: boolean('public').notNull().default(false),
 	},
 	(t) => ({
 		uniquePublicId: unique().on(t.publicId),

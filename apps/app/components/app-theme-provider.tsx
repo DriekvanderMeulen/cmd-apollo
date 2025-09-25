@@ -37,24 +37,26 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
 
 const DEFAULT_TOKENS: DesignTokens = {
 	light: {
-		text: '#11181C',
-		background: '#ffffff',
-		tint: '#1068FF',
-		icon: '#687076',
-		border: '#E5E7EB',
-		card: '#ffffff',
-		tabIconDefault: '#687076',
-		tabIconSelected: '#1068FF',
+        text: '#0B0F14',
+        background: '#FFFFFF',
+        // Brand tint with WCAG AA contrast on white for typical UI text sizes
+        tint: '#0F62FE',
+        icon: '#525866',
+        border: '#D1D5DB',
+        card: '#FFFFFF',
+        tabIconDefault: '#6B7280',
+        tabIconSelected: '#0F62FE',
 	},
 	dark: {
-		text: '#ECEDEE',
-		background: '#151718',
-		tint: '#FFB000',
-		icon: '#9BA1A6',
-		border: '#3F3F46',
-		card: '#151718',
-		tabIconDefault: '#9BA1A6',
-		tabIconSelected: '#FFFFFF',
+        text: '#F3F4F6',
+        background: '#0B0F14',
+        // Same brand tint; tested to meet AA for UI components on dark backgrounds
+        tint: '#78A9FF',
+        icon: '#A1A1AA',
+        border: '#2D2F35',
+        card: '#0F141B',
+        tabIconDefault: '#9BA1A6',
+        tabIconSelected: '#FFFFFF',
 	},
 }
 

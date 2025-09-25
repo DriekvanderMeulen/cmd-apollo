@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ActivityIndicator, FlatList, ListRenderItemInfo, RefreshControl, View, Text } from 'react-native'
+import { ActivityIndicator, FlatList, ListRenderItemInfo, RefreshControl, View, Text, Alert } from 'react-native'
 import { useR2Cache } from '@/components/r2-cache-provider'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -27,8 +27,22 @@ export default function LibraryScreen() {
 	const [categoryId, setCategoryId] = useState<number | null>(null)
 	const [collectionId, setCollectionId] = useState<number | null>(null)
 	const [sort, setSort] = useState<'title' | 'updated'>('updated')
-	const [downloadingPrefixes, setDownloadingPrefixes] = useState<Set<string>>(new Set())
-	const { ensurePrefix, downloadKey } = useR2Cache()
+const [downloadingPrefixes, setDownloadingPrefixes] = useState<Set<string>>(new Set())
+const { ensurePrefix, ensureObject, downloadKey, getCachedSizeForPrefix, getExpectedSizeForPrefix, isPrefixFullyCached, clearPrefix } = useR2Cache()
+
+function formatBytes(bytes: number): string {
+    if (!bytes || bytes <= 0) return '0 B'
+    const units = ['B', 'KB', 'MB', 'GB', 'TB']
+    let idx = 0
+    let value = bytes
+    while (value >= 1000 && idx < units.length - 1) {
+        value = value / 1000
+        idx++
+    }
+    // If in MB (idx===2) and >= 1000 MB, we will go to GB naturally via loop. The example 3400MB -> 3.4GB is covered.
+    const fixed = value >= 100 ? value.toFixed(0) : value >= 10 ? value.toFixed(1) : value.toFixed(1)
+    return `${Number(fixed)} ${units[idx]}`
+}
 
 	useEffect(() => {
 		let cancelled = false
@@ -146,6 +160,16 @@ export default function LibraryScreen() {
 		setIsRefreshing(false)
 	}, [loadPage])
 
+	// While any downloads are active, update the list every second so sizes progress
+	useEffect(() => {
+		if (downloadingPrefixes.size === 0) return
+		const id = setInterval(() => {
+			// Trigger rerender by toggling a dummy state via setState callback
+			setObjects((prev) => [...prev])
+		}, 1000)
+		return () => clearInterval(id)
+	}, [downloadingPrefixes])
+
 	const filteredAndSortedObjects = useMemo(() => {
 		let arr = [...objects]
 		// Client-side filter fallback for tenant if backend doesn't filter
@@ -168,28 +192,67 @@ export default function LibraryScreen() {
 		const collectionLabel = collectionOptions.find((c) => c.id === item.collectionId)?.label
 		const username = item.username || null
 		const onPress = async () => {
-			const prefix = item.cfR2Link || null
+			const original = item.cfR2Link || null
+			const prefix = original
 			if (!prefix) return
 			if (downloadingPrefixes.has(prefix)) return
+			console.log('[library] start download', { prefix, title: item.title, publicId: item.publicId })
 			setDownloadingPrefixes((prev) => new Set(prev).add(prefix))
 			try {
-				const list = await ensurePrefix(prefix)
+				// Prefer object-id based listing for reliability
+				let list = await ensureObject(item.id)
+				console.log('[library] listed prefix', { prefix, count: list.length })
+				if (list.length === 0 && prefix && !prefix.endsWith('/')) {
+					const alt = `${prefix}/`
+					console.log('[library] retry listing with trailing slash', { alt })
+					list = await ensurePrefix(alt)
+					console.log('[library] listed prefix (retry)', { alt, count: list.length })
+				}
+				if (list.length === 0) {
+					console.warn('[library] no objects found for prefix', { prefix })
+					return
+				}
 				await Promise.all(
-					list.map(async (entry) => {
+					list.map(async (entry, idx) => {
 						if (!entry.key) return
-						await downloadKey(entry.key)
+						console.log('[library] download key start', { idx: idx + 1, total: list.length, key: entry.key, size: entry.size })
+						try {
+							await downloadKey(entry.key)
+							console.log('[library] download key done', { key: entry.key })
+						} catch (err) {
+							console.error('[library] download key failed', { key: entry.key, error: err instanceof Error ? err.message : String(err) })
+							throw err
+						}
 					})
 				)
 			} catch (e) {
-				// no-op error surface here; could integrate toast later
+				console.error('[library] prefix download failed', { prefix, error: e instanceof Error ? e.message : String(e) })
 			} finally {
 				setDownloadingPrefixes((prev) => {
 					const copy = new Set(prev)
 					copy.delete(prefix)
 					return copy
 				})
+				console.log('[library] finished download', { prefix })
 			}
 		}
+
+		const prefix = item.cfR2Link || null
+		const downloaded = prefix ? isPrefixFullyCached(prefix) : false
+const downloadedSize = prefix ? getCachedSizeForPrefix(prefix) : 0
+const expectedSize = prefix ? getExpectedSizeForPrefix(prefix) : 0
+const sizeLabel = prefix ? `${formatBytes(downloadedSize)}${expectedSize > 0 && !downloaded ? ` / ${formatBytes(expectedSize)}` : ''}` : null
+		const downloading = prefix ? downloadingPrefixes.has(prefix) : false
+		const onPressDownloadIcon = prefix && downloaded ? () => {
+			Alert.alert(
+				'Delete downloaded data?',
+				'Remove this item\'s cached files from storage?',
+				[
+					{ text: 'Cancel', style: 'cancel' },
+					{ text: 'Delete', style: 'destructive', onPress: () => { clearPrefix(prefix) } },
+				]
+			)
+		} : undefined
 
 		return (
 			<ObjectCard
@@ -199,6 +262,10 @@ export default function LibraryScreen() {
 				categoryLabel={categoryLabel}
 				collectionLabel={collectionLabel}
 				onPress={onPress}
+				downloaded={downloaded}
+				downloading={downloading}
+				sizeLabel={sizeLabel}
+				onPressDownloadIcon={onPressDownloadIcon}
 			/>
 		)
 	}

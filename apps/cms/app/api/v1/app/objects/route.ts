@@ -22,6 +22,8 @@ export async function GET(req: Request): Promise<Response> {
     if (search) wheres.push(like(objectTable.title, `%${search}%`))
     if (cursor) wheres.push(gt(objectTable.publicId, cursor))
     if (tenantIdParam) wheres.push(eq(userTable.tenantId, Number(tenantIdParam)))
+    // Only show public objects
+    wheres.push(eq(objectTable.public, true))
 
     const rows = await db
         .select({

@@ -32,6 +32,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (typeof body.description === "string" || body.description === null) data.description = body.description
   if (typeof body.categoryId === "number" || body.categoryId === null) data.categoryId = body.categoryId
   if (typeof body.cfR2Link === "string" || body.cfR2Link === null) data.cfR2Link = body.cfR2Link
+  if (typeof body.public === "boolean") data.public = body.public
 
   await db.update(objectTable).set(data).where(and(eq(objectTable.id, id), eq(objectTable.userId, user.id)))
   return NextResponse.json({ ok: true })

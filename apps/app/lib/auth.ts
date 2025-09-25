@@ -2,6 +2,7 @@ import { makeRedirectUri } from 'expo-auth-session'
 import Constants from 'expo-constants'
 import * as WebBrowser from 'expo-web-browser'
 import * as SecureStore from 'expo-secure-store'
+import { ensureNetworkAllowed } from '@/lib/connectivity'
 
 const APP_SCHEME = 'jsmnative'
 
@@ -19,6 +20,7 @@ export function getCmsOrigin(): string {
 }
 
 export async function signIn(): Promise<void> {
+	await ensureNetworkAllowed()
 	const redirectUri = getRedirectUri()
 	const cms = getCmsOrigin()
 
@@ -63,6 +65,7 @@ export type AuthUser = {
 }
 
 export async function getMe(): Promise<AuthUser | null> {
+	await ensureNetworkAllowed()
 	const cms = getCmsOrigin()
 	const accessToken = await getAccessToken()
 	if (!accessToken) return null

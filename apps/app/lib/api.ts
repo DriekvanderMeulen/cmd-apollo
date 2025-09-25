@@ -1,4 +1,5 @@
 import { getAccessToken, getCmsOrigin } from '@/lib/auth'
+import { ensureNetworkAllowed } from '@/lib/connectivity'
 
 export type ApiListResponse<T> = {
 	data: Array<T>
@@ -42,6 +43,7 @@ function toParams(params: Record<string, unknown | null | undefined>): string {
 }
 
 async function authorizedFetch(path: string): Promise<Response> {
+	await ensureNetworkAllowed()
 	const base = getCmsOrigin()
 	const token = await getAccessToken()
 	if (!token) throw new Error('Missing access token')
@@ -102,6 +104,13 @@ export type R2ObjectSummary = {
 export async function listR2(prefix: string): Promise<Array<R2ObjectSummary>> {
     const res = await authorizedFetch(`${APP_API_BASE}/r2/list?prefix=${encodeURIComponent(prefix)}`)
     if (!res.ok) throw new Error('Failed to list R2 objects')
+    const json = (await res.json()) as { data: Array<R2ObjectSummary> }
+    return json.data
+}
+
+export async function listR2ByObject(objectId: number): Promise<Array<R2ObjectSummary>> {
+    const res = await authorizedFetch(`${APP_API_BASE}/r2/list-by-object?id=${encodeURIComponent(String(objectId))}`)
+    if (!res.ok) throw new Error('Failed to list R2 objects for object id')
     const json = (await res.json()) as { data: Array<R2ObjectSummary> }
     return json.data
 }

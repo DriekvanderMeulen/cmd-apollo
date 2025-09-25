@@ -74,6 +74,7 @@ export async function POST(req: NextRequest) {
     categoryId: body.categoryId ? Number(body.categoryId) : null,
     // Save base R2 path up to userId (iterations stored as /1..5 below this)
     cfR2Link: `${Number(body.collectionId)}/${user.id}`,
+    public: Boolean(body.public ?? false),
   })
 
   const insertId = (insert as any)?.insertId

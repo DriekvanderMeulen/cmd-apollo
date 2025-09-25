@@ -45,6 +45,7 @@ export function NewObjectForm() {
     return () => { cancelled = true }
   }, [])
   const [files, setFiles] = useState<Array<File | null>>([null, null, null, null, null])
+  const [isPublic, setIsPublic] = useState(false)
 
   const submit = () => {
     const titleTrim = title.trim()
@@ -59,6 +60,7 @@ export function NewObjectForm() {
             description: description.trim() || null,
             collectionId: collectionNum,
             categoryId: categoryId ? Number(categoryId) : null,
+            public: isPublic,
           })
           const id = create.id as number
           const publicId = create.publicId as string
@@ -108,6 +110,10 @@ export function NewObjectForm() {
             ))}
           </select>
         </div>
+      </div>
+      <div className="flex items-center gap-3">
+        <input id="public" type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />
+        <label htmlFor="public" className="text-sm text-neutral-700">Make public (visible in app library)</label>
       </div>
       <div className="space-y-2">
         <div className="text-sm font-medium text-neutral-700">Files (up to 5 iterations)</div>
