@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
 
 import { Button } from '@/components/ui'
+import { QRCodeCanvas } from 'qrcode.react'
 
 type ObjectRow = {
   id: number
@@ -45,6 +46,8 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
   const [existing, setExisting] = useState<Array<{ key: string; iteration: number }>>([])
   const [collections, setCollections] = useState<Array<{ id: number; title: string }>>([])
   const [categories, setCategories] = useState<Array<{ id: number; title: string }>>([])
+  const [qrRenderKey, setQrRenderKey] = useState(0)
+  const qrContainerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -133,6 +136,30 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
     })
   }
 
+  const generateAndDownloadQr = async () => {
+    try {
+      const url = `https://cms.apolloview.com/${publicId}`
+      // Render hidden QR by bumping key to ensure fresh canvas
+      setQrRenderKey((k) => k + 1)
+      await new Promise((r) => setTimeout(r, 50))
+      const canvas = qrContainerRef.current?.querySelector('canvas') as HTMLCanvasElement | null
+      if (!canvas) {
+        toast.error('Failed to render QR')
+        return
+      }
+      const dataUrl = canvas.toDataURL('image/png')
+      const a = document.createElement('a')
+      a.href = dataUrl
+      a.download = `apolloview-${publicId}-qr.png`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      toast.success('QR downloaded')
+    } catch {
+      toast.error('Failed to generate QR')
+    }
+  }
+
   if (!data) return <div className="text-neutral-500">Loading...</div>
 
   return (
@@ -203,9 +230,17 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
         </div>
       </div>
 
-      <div className="flex justify-between">
+      <div className="flex justify-between gap-3">
         <Button title="Delete" variant="danger" onClick={destroy} />
-        <Button title="Save" onClick={save} />
+        <div className="flex gap-3">
+          <Button title="Generate QR" onClick={generateAndDownloadQr} />
+          <Button title="Save" onClick={save} />
+        </div>
+      </div>
+
+      {/* Hidden QR render target */}
+      <div ref={qrContainerRef} style={{ position: 'absolute', left: -99999, top: -99999 }} aria-hidden>
+        <QRCodeCanvas key={qrRenderKey} value={`${window.location.origin}/${publicId}`} includeMargin size={1024} level="M" />
       </div>
     </div>
   )
