@@ -96,9 +96,12 @@ export async function getAvailableTenants() {
   }
 }
 
-export async function completeTenantRegistration(tenantId: number, authString: string): Promise<ActionResult> {
+export async function completeTenantRegistration(
+  tenantId: number,
+  authString: string,
+): Promise<ActionResult> {
   const cookieStore = await cookies();
-  
+
   try {
     // Validate auth string for first-time registration
     if (!authString || authString !== env.AUTH_STRING) {
@@ -106,13 +109,15 @@ export async function completeTenantRegistration(tenantId: number, authString: s
     }
     // Get pending user data from cookies
     const pendingUserDataCookie = cookieStore.get("pending_user_data");
-    
+
     if (!pendingUserDataCookie) {
-      return { error: "No pending registration found. Please try signing in again." };
+      return {
+        error: "No pending registration found. Please try signing in again.",
+      };
     }
 
     const pendingUserData = JSON.parse(pendingUserDataCookie.value);
-    
+
     // Complete the user registration with selected tenant
     const userId = await db.transaction(async (tx) => {
       // Create the user with selected tenant

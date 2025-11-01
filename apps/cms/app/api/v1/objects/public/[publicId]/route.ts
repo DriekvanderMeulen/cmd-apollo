@@ -1,17 +1,22 @@
-import { NextRequest, NextResponse } from "next/server"
-import { and, eq } from "drizzle-orm"
-import { DeleteObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3"
+import { NextRequest, NextResponse } from "next/server";
+import { and, eq } from "drizzle-orm";
+import { DeleteObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 
-import { db } from "@/db"
-import { collectionTable, objectTable } from "@/db/schema"
-import { validateRequest } from "@/server/auth/validate"
-import { R2_BUCKET_NAME, createR2Client } from "@/server/clients/r2"
+import { db } from "@/db";
+import { collectionTable, objectTable } from "@/db/schema";
+import { validateRequest } from "@/server/auth/validate";
+import { R2_BUCKET_NAME, createR2Client } from "@/server/clients/r2";
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ publicId: string }> }) {
-  const { user } = await validateRequest()
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const { publicId } = await params
-  if (!publicId) return NextResponse.json({ error: "Invalid publicId" }, { status: 400 })
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ publicId: string }> },
+) {
+  const { user } = await validateRequest();
+  if (!user)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { publicId } = await params;
+  if (!publicId)
+    return NextResponse.json({ error: "Invalid publicId" }, { status: 400 });
   const rows = await db
     .select({
       id: objectTable.id,
@@ -21,60 +26,94 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ pub
       collectionId: objectTable.collectionId,
       categoryId: objectTable.categoryId,
       cfR2Link: objectTable.cfR2Link,
+      videoR2Key: objectTable.videoR2Key,
       userId: objectTable.userId,
       collectionTitle: collectionTable.title,
     })
     .from(objectTable)
     .leftJoin(collectionTable, eq(objectTable.collectionId, collectionTable.id))
-    .where(and(eq(objectTable.publicId, publicId), eq(objectTable.userId, user.id)))
-  const obj = rows[0]
-  if (!obj) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  return NextResponse.json(obj)
+    .where(
+      and(eq(objectTable.publicId, publicId), eq(objectTable.userId, user.id)),
+    );
+  const obj = rows[0];
+  if (!obj) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  return NextResponse.json(obj);
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ publicId: string }> }) {
-  const { user } = await validateRequest()
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const { publicId } = await params
-  if (!publicId) return NextResponse.json({ error: "Invalid publicId" }, { status: 400 })
-  const body = await req.json().catch(() => null)
-  if (!body) return NextResponse.json({ error: "Invalid body" }, { status: 400 })
-  const data: any = {}
-  if (typeof body.title === "string") data.title = body.title
-  if (typeof body.description === "string" || body.description === null) data.description = body.description
-  if (typeof body.categoryId === "number" || body.categoryId === null) data.categoryId = body.categoryId
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ publicId: string }> },
+) {
+  const { user } = await validateRequest();
+  if (!user)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { publicId } = await params;
+  if (!publicId)
+    return NextResponse.json({ error: "Invalid publicId" }, { status: 400 });
+  const body = await req.json().catch(() => null);
+  if (!body)
+    return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+  const data: any = {};
+  if (typeof body.title === "string") data.title = body.title;
+  if (body.description !== undefined) data.description = body.description; // Allow JSON or null
+  if (typeof body.categoryId === "number" || body.categoryId === null)
+    data.categoryId = body.categoryId;
   if (typeof body.collectionId === "number") {
-    data.collectionId = body.collectionId
+    data.collectionId = body.collectionId;
     // keep base path consistent when collection changes
-    data.cfR2Link = `${Number(body.collectionId)}/${user.id}`
+    data.cfR2Link = `${Number(body.collectionId)}/${user.id}`;
   }
-  if (typeof body.cfR2Link === "string" || body.cfR2Link === null) data.cfR2Link = body.cfR2Link
+  if (typeof body.cfR2Link === "string" || body.cfR2Link === null)
+    data.cfR2Link = body.cfR2Link;
 
-  await db.update(objectTable).set(data).where(and(eq(objectTable.publicId, publicId), eq(objectTable.userId, user.id)))
-  return NextResponse.json({ ok: true })
+  await db
+    .update(objectTable)
+    .set(data)
+    .where(
+      and(eq(objectTable.publicId, publicId), eq(objectTable.userId, user.id)),
+    );
+  return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ publicId: string }> }) {
-  const { user } = await validateRequest()
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const { publicId } = await params
-  if (!publicId) return NextResponse.json({ error: "Invalid publicId" }, { status: 400 })
-  const rows = await db.select().from(objectTable).where(and(eq(objectTable.publicId, publicId), eq(objectTable.userId, user.id)))
-  const obj = rows[0]
-  if (!obj) return NextResponse.json({ ok: true })
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ publicId: string }> },
+) {
+  const { user } = await validateRequest();
+  if (!user)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { publicId } = await params;
+  if (!publicId)
+    return NextResponse.json({ error: "Invalid publicId" }, { status: 400 });
+  const rows = await db
+    .select()
+    .from(objectTable)
+    .where(
+      and(eq(objectTable.publicId, publicId), eq(objectTable.userId, user.id)),
+    );
+  const obj = rows[0];
+  if (!obj) return NextResponse.json({ ok: true });
   try {
-    const client = createR2Client()
+    const client = createR2Client();
     // Delete legacy single key if present
     if (obj.cfR2Link) {
-      await client.send(new DeleteObjectCommand({ Bucket: R2_BUCKET_NAME, Key: obj.cfR2Link }))
+      await client.send(
+        new DeleteObjectCommand({ Bucket: R2_BUCKET_NAME, Key: obj.cfR2Link }),
+      );
     }
     // Delete up to 5 iteration keys under the stored base path
-    const base = obj.cfR2Link || `${obj.collectionId}/${obj.userId}`
+    const base = obj.cfR2Link || `${obj.collectionId}/${obj.userId}`;
     for (let i = 1; i <= 5; i++) {
-      const key = `${base}/${i}`
-      await client.send(new DeleteObjectCommand({ Bucket: R2_BUCKET_NAME, Key: key }))
+      const key = `${base}/${i}`;
+      await client.send(
+        new DeleteObjectCommand({ Bucket: R2_BUCKET_NAME, Key: key }),
+      );
     }
   } catch {}
-  await db.delete(objectTable).where(and(eq(objectTable.publicId, publicId), eq(objectTable.userId, user.id)))
-  return NextResponse.json({ ok: true })
+  await db
+    .delete(objectTable)
+    .where(
+      and(eq(objectTable.publicId, publicId), eq(objectTable.userId, user.id)),
+    );
+  return NextResponse.json({ ok: true });
 }

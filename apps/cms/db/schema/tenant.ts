@@ -1,9 +1,9 @@
-import { int, mysqlTable, varchar } from "drizzle-orm/mysql-core";
+import { serial, pgTable, varchar } from "drizzle-orm/pg-core";
 
 import { cuid } from "../id";
 
-export const tenantTable = mysqlTable("tenants", {
-  id: int("id").autoincrement().primaryKey(),
+export const tenantTable = pgTable("tenants", {
+  id: serial("id").primaryKey(),
   publicId: varchar("public_id", {
     length: 255,
   })

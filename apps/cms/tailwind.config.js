@@ -12,9 +12,9 @@ module.exports = {
           sans: ["var(--font-sf)"],
         },
         borderRadius: {
-          ui: 12,
-          "ui-lg": 16,
-          "ui-sm": 6,
+          ui: 6,
+          "ui-lg": 12,
+          "ui-sm": 4,
         },
         colors: {
           primary: "rgb(var(--primary) / <alpha-value>)",
@@ -39,6 +39,7 @@ module.exports = {
           surface: {
             DEFAULT: "rgb(var(--surface) / <alpha-value>)",
             muted: "rgb(var(--surface-muted) / <alpha-value>)",
+            sidebar: "rgb(var(--surface-sidebar) / <alpha-value>)",
             contrast: "rgb(var(--surface-contrast) / <alpha-value>)",
           },
           border: "rgb(var(--border) / <alpha-value>)",

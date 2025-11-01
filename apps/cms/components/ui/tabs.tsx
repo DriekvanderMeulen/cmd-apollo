@@ -13,7 +13,7 @@ export interface TabsProps {
 function Tabs({ tabs, className }: { tabs: TabsProps[]; className?: string }) {
   return (
     <nav className={cn("mb-4", className)}>
-      <ul className="flex space-x-6 border-b border-neutral-200 px-6">
+      <ul className="flex space-x-1 border-b border-neutral-200">
         {tabs.map((tab) => (
           <Tab key={tab.title} href={tab.href} title={tab.title} />
         ))}
@@ -35,11 +35,10 @@ function Tab({ href, title }: tabProps) {
       <Link
         href={href}
         className={cn(
-          "relative block translate-y-px cursor-pointer border-b-2 pb-4 font-semibold transition-all duration-100",
-          "before:absolute before:left-1/2 before:top-3 before:-z-10 before:h-10 before:w-[calc(100%+24px)] before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-[10px] before:transition-all hover:before:bg-neutral-200",
+          "relative block translate-y-px cursor-pointer border-b-2 px-4 pb-3 text-sm font-medium transition-colors",
           pathname === href
-            ? "border-base-black text-base-black"
-            : "border-transparent text-neutral-500",
+            ? "border-neutral-800 text-neutral-900"
+            : "border-transparent text-neutral-500 hover:text-neutral-700",
         )}
       >
         {title}

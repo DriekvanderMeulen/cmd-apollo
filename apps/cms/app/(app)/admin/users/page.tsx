@@ -1,60 +1,62 @@
-import { redirect } from "next/navigation"
+import { redirect } from "next/navigation";
 
-import { validateRequest } from "@/server/auth/validate"
-import { getAllUsers } from "@/server/admin/actions"
-import { UserManagementTable } from "@/components/admin/user-management-table"
+import { validateRequest } from "@/server/auth/validate";
+import { getAllUsers } from "@/server/admin/actions";
+import { UserManagementTable } from "@/components/admin/user-management-table";
 
 interface AdminUsersPageProps {
-	searchParams: Promise<{
-		q?: string
-		sort?: "name" | "email" | "role"
-		order?: "asc" | "desc" 
-		role?: "ADMIN" | "EDITOR" | "USER"
-		page?: string
-	}>
+  searchParams: Promise<{
+    q?: string;
+    sort?: "name" | "email" | "role";
+    order?: "asc" | "desc";
+    role?: "ADMIN" | "EDITOR" | "USER";
+    page?: string;
+  }>;
 }
 
 async function AdminUsersPage({ searchParams }: AdminUsersPageProps) {
-	const { user } = await validateRequest()
-	
-	if (!user) {
-		redirect("/login")
-	}
-	
-	if (user.role !== "ADMIN") {
-		redirect("/editor")
-	}
+  const { user } = await validateRequest();
 
-	const params = await searchParams
-	const page = params.page ? Number(params.page) : 1
-	const users = await getAllUsers(
-		params.q,
-		params.sort,
-		params.order,
-		params.role,
-		page,
-		6,
-	)
+  if (!user) {
+    redirect("/login");
+  }
 
-	return (
-		<div className="space-y-6">
-			<div>
-				<h1 className="text-2xl font-bold">User Management</h1>
-				<p className="text-neutral-600 mt-1">
-					Manage user accounts, roles, and sessions across the platform.
-				</p>
-			</div>
-			
-			<UserManagementTable 
-				users={users} 
-				searchTerm={params.q}
-				sortBy={params.sort}
-				sortOrder={params.order}
-				roleFilter={params.role}
-				page={page}
-			/>
-		</div>
-	)
+  if (user.role !== "ADMIN") {
+    redirect("/editor");
+  }
+
+  const params = await searchParams;
+  const page = params.page ? Number(params.page) : 1;
+  const users = await getAllUsers(
+    params.q,
+    params.sort,
+    params.order,
+    params.role,
+    page,
+    6,
+  );
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-semibold text-neutral-900">
+          User Management
+        </h1>
+        <p className="text-neutral-600 mt-1.5 text-[15px]">
+          Manage user accounts, roles, and sessions across the platform.
+        </p>
+      </div>
+
+      <UserManagementTable
+        users={users}
+        searchTerm={params.q}
+        sortBy={params.sort}
+        sortOrder={params.order}
+        roleFilter={params.role}
+        page={page}
+      />
+    </div>
+  );
 }
 
-export default AdminUsersPage
+export default AdminUsersPage;
