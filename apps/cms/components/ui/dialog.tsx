@@ -61,13 +61,13 @@ function Dialog({
       <RdxDialog.Portal>
         <RdxDialog.Overlay
           onClick={setIsOpen ? () => setIsOpen(false) : undefined}
-          className="dialog-overlay fixed inset-0 z-40 bg-neutral-200/70 backdrop-blur"
+          className="dialog-overlay fixed inset-0 z-40 bg-neutral-900/40 backdrop-blur-sm"
         />
-        <RdxDialog.Content className="dialog-content no-scrollbar fixed left-1/2 top-1/2 z-50 max-h-[512px] min-w-[672px] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-scroll rounded-3xl bg-white">
+        <RdxDialog.Content className="dialog-content no-scrollbar fixed left-1/2 top-1/2 z-50 max-h-[560px] min-w-[640px] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-scroll rounded-xl bg-white shadow-xl border border-neutral-200">
           <div className="sticky top-0">
-            <div className="flex items-start justify-between bg-white px-7 pb-1 pt-7">
+            <div className="flex items-start justify-between bg-white px-6 pb-2 pt-6 border-b border-neutral-200">
               <div>
-                <RdxDialog.Title className="mb-1 text-2xl font-bold">
+                <RdxDialog.Title className="mb-1 text-xl font-semibold text-neutral-900">
                   {title}
                 </RdxDialog.Title>
                 <RdxDialog.Description className="whitespace-pre-line text-sm text-neutral-500">
@@ -76,14 +76,13 @@ function Dialog({
               </div>
               <RdxDialog.Close
                 onClick={setIsOpen ? () => setIsOpen(false) : undefined}
-                className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 text-base-black"
+                className="flex h-7 w-7 items-center justify-center rounded-md hover:bg-neutral-100 text-neutral-500 hover:text-neutral-700 transition-colors"
               >
-                <HiMiniXMark className="text-neutral-700" size={18} />
+                <HiMiniXMark size={20} />
               </RdxDialog.Close>
             </div>
-            <div className="h-6 bg-gradient-to-b from-white"></div>
           </div>
-          <div className="px-7 pb-7">{children}</div>
+          <div className="px-6 py-5">{children}</div>
         </RdxDialog.Content>
       </RdxDialog.Portal>
     </RdxDialog.Root>

@@ -1,135 +1,93 @@
-# Turborepo starter
+# Apollo Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+Apollo contains the mobile viewer, universal link fallback, and shared CMS utilities that power the QR-to-portfolio experience.
 
-## Using this example
+## Structure
 
-Run the following command:
+- `apps/apollo` – Expo React Native app (QR deep links, offline cache, video-first viewer)
+- `apps/apollo-web` – Next.js universal link fallback (smart banner + in-browser playback)
+- `apps/cms` – existing CMS dashboard
+- `packages/cms` – shared zod schemas, CMS client, mock data, presign helpers
+- `packages/ui` – design tokens and primitives reused across web + native
+- `packages/eslint-config`, `packages/typescript-config` – linting / TS bases
 
-```sh
-npx create-turbo@latest
-```
+## Environment Variables
 
-## What's inside?
+### Shared (server + clients)
 
-This Turborepo includes the following packages/apps:
+- `CMS_BASE_URL` – base HTTPS URL for the CMS API
+- `CMS_ACCESS_TOKEN` – optional bearer token for authenticated requests
+- `R2_PRESIGN_ENDPOINT` – service that returns `{ url, expiresAt }` for an asset key
 
-### Apps and Packages
+### Expo app (`apps/apollo`)
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- `EXPO_PUBLIC_CMS_BASE_URL`
+- `EXPO_PUBLIC_CMS_ACCESS_TOKEN` *(optional)*
+- `EXPO_PUBLIC_R2_PRESIGN_ENDPOINT`
+- `EXPO_PUBLIC_UNIVERSAL_LINK_BASE` (e.g. `https://a.example.com`)
+- `EXPO_PUBLIC_DEEP_LINK_SCHEME` (e.g. `apollo`)
+- `EXPO_PUBLIC_IOS_APP_STORE_URL`, `EXPO_PUBLIC_ANDROID_PLAY_STORE_URL`
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Web fallback (`apps/apollo-web`)
 
-### Utilities
+- `NEXT_PUBLIC_IOS_APP_STORE_URL`
+- `NEXT_PUBLIC_ANDROID_PLAY_STORE_URL`
+- `NEXT_PUBLIC_DEEP_LINK_SCHEME`
+- `NEXT_PUBLIC_R2_PRESIGN_ENDPOINT` *(falls back to server-side `R2_PRESIGN_ENDPOINT`)*
+- `NEXT_PUBLIC_UNIVERSAL_LINK_BASE`
 
-This Turborepo has some additional tools already setup for you:
+> Keep the raw R2 asset keys out of logs and analytics. Presign helpers handle encoding and caching.
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## Getting Started
 
-### Build
+1. Install dependencies (the repo uses Bun workspaces):
 
-To build all apps and packages, run the following command:
+   ```sh
+   bun install
+   ```
 
-```
-cd my-turborepo
+2. Create `.env` files for the apps you run (values listed above) or export the variables in your shell.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+3. Start the desired targets:
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+   ```sh
+   # Expo app
+   cd apps/apollo
+   bunx expo start
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+   # Web fallback
+   cd apps/apollo-web
+   bun dev
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+   # CMS (optional)
+   cd apps/cms
+   bun dev
+   ```
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+   You can also filter with Turbo: `bunx turbo run dev --filter=apollo`.
 
-### Develop
+## Testing
 
-To develop all apps and packages, run the following command:
+- Unit tests run with Vitest:
 
-```
-cd my-turborepo
+  ```sh
+  bun run test
+  ```
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+- Current coverage:
+  - `packages/cms`: presign helper contract + external key detection
+  - `apps/apollo`: mobile presign cache behaviour
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+## Smoke Test Checklist
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+1. **QR → App**: scan a link to an item with two iterations. Expect Apollo to open, autoplay the first video, reveal details after completion or swipe, and allow left/right navigation.
+2. **No app installed**: open the same QR in Safari/Chrome without the app. Confirm the smart banner attempts the deep link, offers “Open in browser”, and shows the correct store link.
+3. **Theme contrast**: toggle device/theme (light + dark). Primary red must meet WCAG AA (4.5:1 body, 3:1 large text). Details overlay gradient keeps white text legible on video stills.
+4. **Offline revisit**: disable network, reopen the item from the View tab. Metadata and poster remain cached, video failure surfaces the retry + open-on-web actions.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+## Useful Commands
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+- `bun run build` – build all apps and packages
+- `bun run check-types` – type-check workspace
+- `bun run lint` – lint everything via Turbo
+- `bun run test` – execute Vitest suite

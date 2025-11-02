@@ -3,8 +3,10 @@ import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { parseJWT } from "oslo/jwt";
 import { NextRequest } from "next/server";
+import { randomBytes } from "crypto";
 
-import { db, oAuthAccountsTable, tenantTable, userTable } from "@/db";
+import { db, oAuthAccountsTable, userTable } from "@/db";
+import { appCodes } from "@/db/schema/appCodes";
 import { lucia } from "@/server/auth";
 
 interface GoogleClaims {
@@ -77,6 +79,9 @@ export async function GET(req: NextRequest) {
       .where(eq(oAuthAccountsTable.providerAccountId, idToken.sub))
       .rightJoin(userTable, eq(oAuthAccountsTable.userId, userTable.id));
 
+    // Were we launched from the app?
+    const appRedirect = cookieStore.get("app_redirect")?.value || null;
+
     if (existingUser[0]) {
       // update tokens
       await db
@@ -95,6 +100,23 @@ export async function GET(req: NextRequest) {
         sessionCookie.value,
         sessionCookie.attributes,
       );
+
+      // If this came from the app, mint a one-time code and deep link back
+      if (appRedirect) {
+        const codeForApp = randomBytes(32).toString("hex");
+        const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+        await db.insert(appCodes).values({
+          code: codeForApp,
+          userId: existingUser[0].users.id,
+          expiresAt,
+        });
+        // single use cookie
+        cookieStore.delete("app_redirect");
+
+        const deepLink = new URL(appRedirect);
+        deepLink.searchParams.set("code", codeForApp);
+        return Response.redirect(deepLink.toString(), 302);
+      }
 
       return new Response(null, {
         status: 302,

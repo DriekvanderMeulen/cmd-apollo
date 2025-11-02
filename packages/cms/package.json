@@ -1,0 +1,29 @@
+{
+	"name": "cms",
+	"version": "0.0.0",
+	"private": true,
+	"exports": {
+		".": "./src/index.ts",
+		"./index": "./src/index.ts",
+		"./types": "./src/types.ts",
+		"./client": "./src/client.ts",
+		"./mock": "./src/mock-client.ts",
+		"./mock-data": "./src/mock-data.ts",
+		"./presign": "./src/presign.ts",
+		"./package.json": "./package.json"
+	},
+	"types": "./src/index.ts",
+	"scripts": {
+		"check-types": "tsc --noEmit",
+		"test": "vitest --run"
+	},
+	"dependencies": {
+		"zod": "^3.24.1"
+	},
+	"devDependencies": {
+		"@repo/typescript-config": "*",
+		"@types/node": "^22.15.3",
+		"typescript": "5.9.2"
+	}
+}
+

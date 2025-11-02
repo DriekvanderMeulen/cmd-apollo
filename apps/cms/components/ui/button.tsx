@@ -21,18 +21,18 @@ interface ButtonLinkProps extends LinkProps, BaseButtonProps {
 }
 
 const variants = cva(
-  "h-11 rounded-[10px] transition-colors duration-150 px-5 justify-center space-x-3 inline-flex items-center font-semibold leading-11 border border-transparent",
+  "h-9 rounded-md transition-colors px-4 justify-center space-x-2 inline-flex items-center font-medium text-sm border border-transparent",
   {
     variants: {
       variant: {
         primary:
-          "text-white bg-primary hover:brightness-95 active:brightness-90",
+          "text-white bg-neutral-800 hover:bg-neutral-900 active:bg-neutral-950 shadow-sm",
         secondary:
-          "text-base-black bg-white border-neutral-200 hover:bg-neutral-100",
+          "text-neutral-700 bg-white border-neutral-200 hover:bg-neutral-50 shadow-sm",
         "secondary-gray":
-          "text-base-black bg-neutral-100 border-neutral-200 hover:bg-neutral-200",
+          "text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80",
         danger:
-          "text-white bg-red-600 hover:bg-red-700 active:bg-red-800",
+          "text-white bg-red-600 hover:bg-red-700 active:bg-red-800 shadow-sm",
       },
     },
     defaultVariants: {
@@ -88,9 +88,7 @@ export function ButtonLink({
   return (
     <Link
       {...props}
-      aria-label={
-        typeof content === "string" ? (content as string) : undefined
-      }
+      aria-label={typeof content === "string" ? (content as string) : undefined}
       className={cn(variants({ variant }), className)}
     >
       {iconLeft ? iconLeft : null}

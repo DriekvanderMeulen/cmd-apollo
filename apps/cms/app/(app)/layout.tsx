@@ -17,15 +17,17 @@ async function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <>
-      <div className="relative z-10 flex h-full overflow-hidden">
+      <div className="relative z-10 flex h-full overflow-hidden bg-white">
         <Navigation user={user} />
         <div className="min-h-full grow overflow-y-scroll pb-8">
-          <main className="wrapper pt-16 flex min-h-full flex-col">{children}</main>
+          <main className="wrapper pt-12 flex min-h-full flex-col">
+            {children}
+          </main>
         </div>
       </div>
       <Toaster
         toastOptions={{
-          className: "!shadow-none font-semibold",
+          className: "!shadow-none font-medium",
         }}
         position="bottom-right"
       />
