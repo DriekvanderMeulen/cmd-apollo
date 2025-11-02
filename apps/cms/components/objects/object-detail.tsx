@@ -73,6 +73,21 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
   const [editingIteration, setEditingIteration] = useState<IterationRow | null>(
     null,
   );
+  const [universalLink, setUniversalLink] = useState<string>("");
+
+  useEffect(() => {
+    const rawWebBase = (process.env.NEXT_PUBLIC_WEB_APP_BASE_URL || "").trim();
+    const rawUniversalBase = (process.env.NEXT_PUBLIC_UNIVERSAL_LINK_BASE || "").trim();
+
+    const baseCandidate = rawWebBase || rawUniversalBase;
+    const fallbackBase = typeof window !== "undefined" ? window.location.origin : "";
+    const normalizedBase = (baseCandidate || fallbackBase).replace(/\/$/, "");
+
+    if (normalizedBase) {
+      setUniversalLink(`${normalizedBase}/i/${publicId}`);
+      setQrRenderKey((k) => k + 1);
+    }
+  }, [publicId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -260,7 +275,10 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
 
   const generateAndDownloadQr = async () => {
     try {
-      const url = `https://cms.apolloview.com/${publicId}`;
+      if (!universalLink) {
+        toast.error("Universal link unavailable");
+        return;
+      }
       // Render hidden QR by bumping key to ensure fresh canvas
       setQrRenderKey((k) => k + 1);
       await new Promise((r) => setTimeout(r, 50));
@@ -274,7 +292,7 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
       const dataUrl = canvas.toDataURL("image/png");
       const a = document.createElement("a");
       a.href = dataUrl;
-      a.download = `apolloview-${publicId}-qr.png`;
+      a.download = `apollo-${publicId}-qr.png`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -458,13 +476,15 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
         style={{ position: "absolute", left: -99999, top: -99999 }}
         aria-hidden
       >
-        <QRCodeCanvas
-          key={qrRenderKey}
-          value={`${window.location.origin}/${publicId}`}
-          includeMargin
-          size={1024}
-          level="M"
-        />
+        {universalLink ? (
+          <QRCodeCanvas
+            key={qrRenderKey}
+            value={universalLink}
+            includeMargin
+            size={1024}
+            level="M"
+          />
+        ) : null}
       </div>
 
       {/* Iteration Form Dialog */}
