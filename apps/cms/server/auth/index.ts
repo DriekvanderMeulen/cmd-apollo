@@ -4,7 +4,11 @@ import { Lucia } from "lucia";
 import { db } from "@/db";
 import { sessionTable, userTable } from "@/db/schema";
 
-const adapter = new DrizzlePostgreSQLAdapter(db, sessionTable, userTable);
+const adapter = new DrizzlePostgreSQLAdapter(
+  db as unknown as ConstructorParameters<typeof DrizzlePostgreSQLAdapter>[0],
+  sessionTable as unknown as ConstructorParameters<typeof DrizzlePostgreSQLAdapter>[1],
+  userTable as unknown as ConstructorParameters<typeof DrizzlePostgreSQLAdapter>[2],
+);
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
