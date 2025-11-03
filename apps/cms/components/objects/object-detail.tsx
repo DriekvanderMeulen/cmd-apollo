@@ -260,7 +260,7 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
 
   const generateAndDownloadQr = async () => {
     try {
-      const url = `https://app.apolloview.app/${publicId}`;
+      const url = `https://cms.apolloview.com/${publicId}`;
       // Render hidden QR by bumping key to ensure fresh canvas
       setQrRenderKey((k) => k + 1);
       await new Promise((r) => setTimeout(r, 50));
