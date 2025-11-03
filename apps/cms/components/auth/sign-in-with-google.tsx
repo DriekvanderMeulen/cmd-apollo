@@ -25,8 +25,8 @@ function SignInWithGoogle() {
       iconLeft={<FcGoogle size={20} />}
       title="Sign in with Google"
       isLoading={isLoading}
-      variant="secondary-gray"
-      className="w-full border-black border cursor-pointer"
+      variant="secondary"
+      className="w-full rounded-sm bg-red-100 border-black hover:bg-red-200 hover:border-red-500 cursor-pointer"
     />
   );
 }

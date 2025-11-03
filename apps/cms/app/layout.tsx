@@ -6,7 +6,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "ApolloView CMS",
-  description: "ApolloView CMS, the content management system for the ApolloView app",
+  description:
+    "ApolloView CMS, the content management system for the ApolloView app",
 };
 
 const sf = localFont({

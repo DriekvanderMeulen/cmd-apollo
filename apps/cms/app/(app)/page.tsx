@@ -13,8 +13,12 @@ async function Home() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Your objects</h1>
-        <p className="text-neutral-600 mt-1">Create and manage your objects.</p>
+        <h1 className="text-3xl font-semibold text-neutral-900">
+          Your objects
+        </h1>
+        <p className="text-neutral-600 mt-1.5 text-[15px]">
+          Create and manage your objects.
+        </p>
       </div>
       <ObjectsTable />
     </div>

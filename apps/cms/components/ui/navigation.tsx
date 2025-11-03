@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LogOut, Users, UserRoundCog } from 'lucide-react'
+import { Home, LogOut, Users, UserRoundCog } from "lucide-react";
 
 import { logout } from "@/server/auth/actions";
 import { cn } from "@/utils";
@@ -31,10 +31,10 @@ function NavigationItem({ href, active, label, icon }: NavigationItemProps) {
       <Link
         href={href}
         className={cn(
-          "flex items-center space-x-3 rounded-[10px] px-3.5 py-2.5 text-sm font-medium transition-all duration-75",
+          "flex items-center space-x-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors",
           active
-            ? "bg-neutral-200"
-            : "text-neutral-600 hover:bg-neutral-200 hover:text-base-black",
+            ? "bg-neutral-200/70 text-neutral-900"
+            : "text-neutral-600 hover:bg-neutral-100/60 hover:text-neutral-800",
         )}
       >
         {icon}
@@ -48,19 +48,18 @@ function Navigation({ user }: NavigationProps) {
   const pathname = usePathname();
 
   return (
-    <header className="flex h-full w-64 shrink-0 flex-col justify-between pb-4 pl-2.5 pt-2.5">
+    <header className="flex h-full w-64 shrink-0 flex-col justify-between bg-surface-sidebar border-r border-neutral-200 pb-5 px-3 pt-3">
       <div>
-        <button className="mb-2.5 flex w-full items-center justify-between rounded-[10px] p-3">
+        <div className="mb-4 flex w-full items-center justify-between px-2 py-2">
           <div className="flex items-center space-x-2">
-            <div className="flex h-6 w-6 items-center justify-center">
-
-            </div>
-            <span className="font-semibold">Apolloview CMS</span>
+            <div className="flex h-6 w-6 items-center justify-center"></div>
+            <span className="font-semibold text-neutral-800">
+              Apolloview CMS
+            </span>
           </div>
-          {/* <HiChevronUpDown size={20} /> */}
-        </button>
+        </div>
 
-        <ul className="mb-6 space-y-px">
+        <ul className="mb-6 space-y-1">
           <NavigationItem
             href="/"
             active={pathname === "/"}
@@ -86,42 +85,39 @@ function Navigation({ user }: NavigationProps) {
         </ul>
       </div>
       <div>
-        <div className="mb-2.5">
+        <div className="mb-3">
           {/* @ts-expect-error */}
           <form action={logout}>
-            <button className="flex w-full items-center space-x-3 rounded-[10px] px-3.5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-75">
-              <LogOut size={18} />
+            <button className="flex w-full items-center space-x-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-red-600 hover:bg-red-50/80 transition-colors">
+              <LogOut size={16} />
               <span>Logout</span>
             </button>
           </form>
         </div>
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center space-x-3">
-            <div className="flex h-10 items-center">
+        <div className="flex items-center justify-between rounded-md px-2 py-2 hover:bg-neutral-100/50 transition-colors">
+          <div className="flex items-center space-x-2.5">
+            <div className="flex items-center">
               {user.picture ? (
                 <img
-                  className="h-8 w-8 rounded-full"
+                  className="h-7 w-7 rounded-full"
                   src={user.picture}
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-900 font-semibold capitalize text-black">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-white text-xs font-semibold capitalize">
                   {user.givenName[0]}
                 </div>
               )}
             </div>
-            <div>
-              <div className="-mb-[3px] font-semibold">
+            <div className="overflow-hidden">
+              <div className="text-sm font-medium text-neutral-800 truncate">
                 {user.givenName} {user.familyName}
               </div>
-              <div className="text-[12px] font-medium text-neutral-500">
+              <div className="text-xs text-neutral-500 truncate">
                 {user.email}
               </div>
             </div>
           </div>
-          {/* <button className="rounded-full p-1.5 hover:bg-neutral-200">
-            <HiMiniEllipsisVertical size={20} />
-          </button> */}
         </div>
       </div>
     </header>

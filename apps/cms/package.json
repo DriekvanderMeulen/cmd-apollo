@@ -9,6 +9,7 @@
     "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:push": "drizzle-kit push",
+    "db:push:railway": "NODE_ENV=production drizzle-kit push",
     "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
@@ -24,19 +25,27 @@
     "drizzle-orm": "^0.44.5",
     "lodash": "^4.17.21",
     "lucia": "^3.2.2",
-    "mysql2": "^3.15.0",
+    "lucide-react": "^0.469.0",
+    "postgres": "^3.4.5",
     "nanoid": "^5.1.5",
     "next": "15.5.3",
     "oslo": "^1.2.1",
+    "qrcode.react": "^4.2.0",
     "react": "19.1.0",
     "react-datepicker": "^8.7.0",
     "react-dom": "19.1.0",
     "react-hot-toast": "^2.6.0",
-    "lucide-react": "^0.469.0",
     "react-icons": "^5.5.0",
     "tailwind-merge": "^3.3.1",
     "winston": "^3.17.0",
-    "zod": "^4.1.9"
+    "zod": "^4.1.9",
+    "@tiptap/react": "^3.0.0",
+    "@tiptap/pm": "^3.0.0",
+    "@tiptap/starter-kit": "^3.0.0",
+    "@tiptap/extension-underline": "^3.0.0",
+    "@tiptap/extension-link": "^3.0.0",
+    "@tiptap/extension-placeholder": "^3.0.0",
+    "@floating-ui/dom": "^1.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
