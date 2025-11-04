@@ -1,23 +1,72 @@
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
-import { DeleteObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { and, asc, eq } from "drizzle-orm";
+import { DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { createHash } from "crypto";
 
 import { db } from "@/db";
-import { collectionTable, objectTable } from "@/db/schema";
+import {
+	collectionTable,
+	objectTable,
+	userTable,
+	categoryTable,
+	iterationTable,
+} from "@/db/schema";
 import { validateRequest } from "@/server/auth/validate";
+import { requireBearerToken } from "@/lib/bearerAuth";
 import { R2_BUCKET_NAME, createR2Client } from "@/server/clients/r2";
 
+function generateETag(data: unknown): string {
+	const jsonString = JSON.stringify(data)
+	const hash = createHash('sha256').update(jsonString).digest('hex')
+	return `"${hash}"`
+}
+
+function generateVersion(obj: {
+	id: number
+	title: string
+	description: unknown
+	iterationCount: number
+}): string {
+	const contentString = `${obj.id}-${obj.title}-${JSON.stringify(obj.description)}-${obj.iterationCount}`
+	const hash = createHash('sha256').update(contentString).digest('hex')
+	return hash.substring(0, 16)
+}
+
+async function generateSignedUrl(key: string): Promise<string | null> {
+	if (!key) return null
+	try {
+		const client = createR2Client()
+		const command = new GetObjectCommand({
+			Bucket: R2_BUCKET_NAME,
+			Key: key,
+		})
+		const signedUrl = await getSignedUrl(client, command, { expiresIn: 3600 })
+		return signedUrl
+	} catch (error) {
+		console.error('Failed to generate signed URL:', error)
+		return null
+	}
+}
+
 export async function GET(
-  _req: NextRequest,
+	req: Request,
   { params }: { params: Promise<{ publicId: string }> },
-) {
-  const { user } = await validateRequest();
-  if (!user)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { publicId } = await params;
-  if (!publicId)
-    return NextResponse.json({ error: "Invalid publicId" }, { status: 400 });
-  const rows = await db
+): Promise<Response> {
+	try {
+		requireBearerToken(req)
+	} catch (error) {
+		if (error instanceof Response) {
+			return error
+		}
+		return new Response('Unauthorized', { status: 401 })
+	}
+
+	const { publicId } = await params
+	if (!publicId) return new Response('Invalid publicId', { status: 400 })
+
+	// Find the object by publicId (no public check - trusts list endpoint)
+	const objectRows = await db
     .select({
       id: objectTable.id,
       publicId: objectTable.publicId,
@@ -28,16 +77,100 @@ export async function GET(
       cfR2Link: objectTable.cfR2Link,
       videoR2Key: objectTable.videoR2Key,
       userId: objectTable.userId,
+			userPublicId: userTable.publicId,
+			userGivenName: userTable.givenName,
+			userFamilyName: userTable.familyName,
+			userEmail: userTable.email,
       collectionTitle: collectionTable.title,
+			collectionPublicId: collectionTable.publicId,
+			categoryTitle: categoryTable.title,
+			categoryPublicId: categoryTable.publicId,
     })
     .from(objectTable)
-    .leftJoin(collectionTable, eq(objectTable.collectionId, collectionTable.id))
-    .where(
-      and(eq(objectTable.publicId, publicId), eq(objectTable.userId, user.id)),
-    );
-  const obj = rows[0];
-  if (!obj) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json(obj);
+		.leftJoin(userTable, eq(userTable.id, objectTable.userId))
+		.leftJoin(collectionTable, eq(collectionTable.id, objectTable.collectionId))
+		.leftJoin(categoryTable, eq(categoryTable.id, objectTable.categoryId))
+		.where(eq(objectTable.publicId, publicId))
+
+	const objRow = objectRows[0]
+	if (!objRow) return new Response('Not found', { status: 404 })
+
+	// Get iterations sorted by date ASC
+	const iterations = await db
+		.select({
+			id: iterationTable.id,
+			title: iterationTable.title,
+			date: iterationTable.date,
+			description: iterationTable.description,
+		})
+		.from(iterationTable)
+		.where(eq(iterationTable.objectId, objRow.id))
+		.orderBy(asc(iterationTable.date))
+
+	// Generate signed URLs for poster and video
+	const posterUrl = objRow.cfR2Link
+		? await generateSignedUrl(objRow.cfR2Link)
+		: null
+	const videoUrl = objRow.videoR2Key
+		? await generateSignedUrl(objRow.videoR2Key)
+		: null
+
+	// Build response
+	const response = {
+		publicId: objRow.publicId,
+		title: objRow.title,
+		description: objRow.description,
+		user: {
+			id: objRow.userId,
+			publicId: objRow.userPublicId,
+			givenName: objRow.userGivenName,
+			familyName: objRow.userFamilyName,
+			email: objRow.userEmail,
+		},
+		collection: {
+			id: objRow.collectionId,
+			publicId: objRow.collectionPublicId,
+			title: objRow.collectionTitle,
+		},
+		category: objRow.categoryId
+			? {
+					id: objRow.categoryId,
+					publicId: objRow.categoryPublicId,
+					title: objRow.categoryTitle,
+				}
+			: null,
+		posterUrl,
+		videoUrl,
+		iterations,
+		version: generateVersion({
+			id: objRow.id,
+			title: objRow.title,
+			description: objRow.description,
+			iterationCount: iterations.length,
+		}),
+	}
+
+	const etag = generateETag(response)
+
+	return Response.json(response, {
+		headers: {
+			ETag: etag,
+			'Access-Control-Allow-Origin': '*',
+			'Access-Control-Allow-Methods': 'GET, OPTIONS',
+			'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+		},
+	})
+}
+
+export async function OPTIONS(): Promise<Response> {
+	return new Response(null, {
+		status: 204,
+		headers: {
+			'Access-Control-Allow-Origin': '*',
+			'Access-Control-Allow-Methods': 'GET, OPTIONS',
+			'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+		},
+	})
 }
 
 export async function PATCH(
