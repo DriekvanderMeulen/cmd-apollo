@@ -6,5 +6,5 @@ export type BottomTabParamList = {
 
 export type RootStackParamList = {
 	RootTabs: undefined
-	ItemDetail: undefined
+    ItemDetail: { publicId: string }
 }

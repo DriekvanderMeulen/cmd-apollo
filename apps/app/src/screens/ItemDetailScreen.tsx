@@ -1,12 +1,19 @@
 import React from 'react'
 import { Text } from 'react-native'
+import type { RouteProp } from '@react-navigation/native'
 
 import { ScreenContainer } from '../components/ScreenContainer'
+import type { RootStackParamList } from '../types/navigation'
 
-export function ItemDetailScreen(): React.JSX.Element {
-	return (
-		<ScreenContainer title="Item Detail">
-			<Text>Details for a selected item will be shown on this screen.</Text>
-		</ScreenContainer>
-	)
+export function ItemDetailScreen({
+    route,
+}: {
+    route: RouteProp<RootStackParamList, 'ItemDetail'>
+}): React.JSX.Element {
+    const { publicId } = route.params
+    return (
+        <ScreenContainer title="Item Detail">
+            <Text>Public ID: {publicId}</Text>
+        </ScreenContainer>
+    )
 }

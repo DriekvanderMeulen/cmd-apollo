@@ -7,10 +7,18 @@ import { RootNavigator } from './src/navigation/RootNavigator'
 import { QueryProvider } from './src/providers/QueryProvider'
 
 export default function App(): React.JSX.Element {
+    const linking = {
+        prefixes: ['https://cms.apolloview.app', 'apolloview://'],
+        config: {
+            screens: {
+                ItemDetail: 'object/:publicId',
+            },
+        },
+    }
 	return (
 		<SafeAreaProvider>
 			<QueryProvider>
-				<NavigationContainer>
+				<NavigationContainer linking={linking}>
 					<StatusBar style="dark" />
 					<RootNavigator />
 				</NavigationContainer>

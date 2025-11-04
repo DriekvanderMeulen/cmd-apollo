@@ -12,6 +12,7 @@ const Tab = createBottomTabNavigator<BottomTabParamList>()
 export function BottomTabs(): React.JSX.Element {
 	return (
 		<Tab.Navigator
+			initialRouteName="Library"
 			screenOptions={{
 				headerShown: false,
 				tabBarLabelStyle: {
