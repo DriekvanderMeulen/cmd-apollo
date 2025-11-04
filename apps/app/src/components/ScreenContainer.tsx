@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 type ScreenContainerProps = {
 	title: string
@@ -8,10 +9,13 @@ type ScreenContainerProps = {
 
 export function ScreenContainer({ title, children }: ScreenContainerProps): React.JSX.Element {
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
 			<Text style={styles.title}>{title}</Text>
-			<View style={styles.content}>{children}</View>
-		</View>
+			{/* Content area respects safe insets + padding */}
+			<SafeAreaView style={styles.content} edges={['left', 'right', 'bottom']}>
+				{children}
+			</SafeAreaView>
+		</SafeAreaView>
 	)
 }
 
@@ -19,8 +23,8 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: '#fff',
-		paddingHorizontal: 24,
-		paddingVertical: 32,
+    paddingHorizontal: 24,
+    paddingVertical: 16,
 	},
 	title: {
 		fontSize: 24,

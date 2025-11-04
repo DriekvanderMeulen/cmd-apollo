@@ -1,5 +1,6 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { Ionicons } from '@expo/vector-icons'
 
 import { LibraryScreen } from '../screens/LibraryScreen'
 import { ScanInstructionsScreen } from '../screens/ScanInstructionsScreen'
@@ -17,15 +18,42 @@ export function BottomTabs(): React.JSX.Element {
 					fontSize: 13,
 					fontWeight: '600',
 				},
+				tabBarIcon: ({ color, size, focused }) => (
+					// default icon when not overridden per screen
+					<Ionicons name={focused ? 'ellipse' : 'ellipse-outline'} color={color} size={size} />
+				),
 			}}
 		>
 			<Tab.Screen
 				name="ScanInstructions"
 				component={ScanInstructionsScreen}
-				options={{ title: 'Scan' }}
+				options={{
+					title: 'Scan',
+					tabBarIcon: ({ color, size, focused }) => (
+						<Ionicons name={focused ? 'scan' : 'scan-outline'} color={color} size={size} />
+					),
+				}}
 			/>
-			<Tab.Screen name="Library" component={LibraryScreen} options={{ title: 'Library' }} />
-			<Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
+			<Tab.Screen
+				name="Library"
+				component={LibraryScreen}
+				options={{
+					title: 'Library',
+					tabBarIcon: ({ color, size, focused }) => (
+						<Ionicons name={focused ? 'library' : 'library-outline'} color={color} size={size} />
+					),
+				}}
+			/>
+			<Tab.Screen
+				name="Settings"
+				component={SettingsScreen}
+				options={{
+					title: 'Settings',
+					tabBarIcon: ({ color, size, focused }) => (
+						<Ionicons name={focused ? 'settings' : 'settings-outline'} color={color} size={size} />
+					),
+				}}
+			/>
 		</Tab.Navigator>
 	)
 }
