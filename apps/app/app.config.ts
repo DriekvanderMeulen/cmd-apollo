@@ -7,5 +7,3 @@ export default ({ config }: { config: any }) => ({
 		cmsReadToken: process.env.EXPO_PUBLIC_CMS_READ_TOKEN,
 	},
 })
-
-

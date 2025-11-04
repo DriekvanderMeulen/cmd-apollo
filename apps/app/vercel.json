@@ -1,31 +1,30 @@
 {
-  "buildCommand": "npx expo export -p web",
-  "outputDirectory": "dist",
-  "headers": [
-    {
-      "source": "/.well-known/apple-app-site-association",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/json"
-        }
-      ]
-    },
-    {
-      "source": "/.well-known/assetlinks.json",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/json"
-        }
-      ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+	"buildCommand": "npx expo export -p web",
+	"outputDirectory": "dist",
+	"headers": [
+		{
+			"source": "/.well-known/apple-app-site-association",
+			"headers": [
+				{
+					"key": "Content-Type",
+					"value": "application/json"
+				}
+			]
+		},
+		{
+			"source": "/.well-known/assetlinks.json",
+			"headers": [
+				{
+					"key": "Content-Type",
+					"value": "application/json"
+				}
+			]
+		}
+	],
+	"rewrites": [
+		{
+			"source": "/(.*)",
+			"destination": "/index.html"
+		}
+	]
 }
-

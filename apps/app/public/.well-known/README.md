@@ -27,10 +27,11 @@ These files enable universal links (iOS) and app links (Android) for the app.
 ## Deployment
 
 These files must be accessible at:
+
 - `https://app.apolloview.app/.well-known/apple-app-site-association`
 - `https://app.apolloview.app/.well-known/assetlinks.json`
 
 Make sure your Vercel deployment serves these files with the correct headers:
+
 - `Content-Type: application/json` (or no content-type for iOS AASA)
 - Accessible without authentication
-

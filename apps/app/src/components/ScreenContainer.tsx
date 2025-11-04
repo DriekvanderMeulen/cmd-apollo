@@ -23,8 +23,8 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: '#fff',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+		paddingHorizontal: 24,
+		paddingVertical: 16,
 	},
 	title: {
 		fontSize: 24,

@@ -1,9 +1,7 @@
 import { BEARER_TOKEN, CMS_API_URL } from '@/constants/config'
 import type { ObjectData } from './storage'
 
-export async function fetchObjectData(
-	publicId: string,
-): Promise<ObjectData> {
+export async function fetchObjectData(publicId: string): Promise<ObjectData> {
 	const url = `${CMS_API_URL}/api/v1/app/objects/public/${publicId}/full`
 
 	const response = await fetch(url, {
@@ -27,4 +25,3 @@ export async function fetchObjectData(
 	const data = await response.json()
 	return data as ObjectData
 }
-

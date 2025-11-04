@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
+import { StyleSheet, ActivityIndicator } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
 
 import { fetchObjectData } from '@/lib/api'
@@ -73,15 +73,9 @@ export default function ObjectDetailScreen() {
 			<ThemedText type="title" style={styles.title}>
 				{data.object.title}
 			</ThemedText>
-			<ThemedText style={styles.subtitle}>
-				Public ID: {data.object.publicId}
-			</ThemedText>
-			<ThemedText style={styles.sectionTitle}>
-				Iterations: {data.iterations.length}
-			</ThemedText>
-			<ThemedText style={styles.sectionTitle}>
-				R2 Files: {data.r2Files.length}
-			</ThemedText>
+			<ThemedText style={styles.subtitle}>Public ID: {data.object.publicId}</ThemedText>
+			<ThemedText style={styles.sectionTitle}>Iterations: {data.iterations.length}</ThemedText>
+			<ThemedText style={styles.sectionTitle}>R2 Files: {data.r2Files.length}</ThemedText>
 		</ThemedView>
 	)
 }
@@ -113,4 +107,3 @@ const styles = StyleSheet.create({
 		marginTop: 8,
 	},
 })
-

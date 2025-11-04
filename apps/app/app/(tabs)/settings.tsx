@@ -2,9 +2,9 @@ import React from 'react'
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native'
 import Constants from 'expo-constants'
 
-import { ScreenContainer } from '../components/ScreenContainer'
+import { ScreenContainer } from '@/src/components/ScreenContainer'
 
-export function SettingsScreen(): React.JSX.Element {
+export default function SettingsScreen(): React.JSX.Element {
 	const version = Constants.expoConfig?.version ?? '1.0.0'
 	const buildNumber =
 		Constants.expoConfig?.ios?.buildNumber ??

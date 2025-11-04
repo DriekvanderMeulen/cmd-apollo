@@ -34,10 +34,7 @@ export interface ObjectData {
 	}>
 }
 
-export async function storeObjectData(
-	publicId: string,
-	data: ObjectData,
-): Promise<void> {
+export async function storeObjectData(publicId: string, data: ObjectData): Promise<void> {
 	try {
 		const key = getStorageKey(publicId)
 		const jsonValue = JSON.stringify(data)
@@ -48,9 +45,7 @@ export async function storeObjectData(
 	}
 }
 
-export async function getObjectData(
-	publicId: string,
-): Promise<ObjectData | null> {
+export async function getObjectData(publicId: string): Promise<ObjectData | null> {
 	try {
 		const key = getStorageKey(publicId)
 		const jsonValue = await AsyncStorage.getItem(key)
@@ -70,4 +65,3 @@ export async function clearObjectData(publicId: string): Promise<void> {
 		throw error
 	}
 }
-

@@ -36,5 +36,3 @@ export async function get(path: string, init?: RequestInit): Promise<JsonValue> 
 }
 
 export const api = { get }
-
-

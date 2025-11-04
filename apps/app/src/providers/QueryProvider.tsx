@@ -19,7 +19,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
 					},
 				},
 			}),
-		[],
+		[]
 	)
 
 	const persister = useMemo(
@@ -28,7 +28,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
 				storage: AsyncStorage,
 				throttleTime: 1000,
 			}),
-		[],
+		[]
 	)
 
 	return (
@@ -37,5 +37,3 @@ export function QueryProvider({ children }: QueryProviderProps) {
 		</PersistQueryClientProvider>
 	)
 }
-
-
