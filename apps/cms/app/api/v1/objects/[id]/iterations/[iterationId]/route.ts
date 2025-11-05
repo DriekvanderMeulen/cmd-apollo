@@ -50,7 +50,14 @@ export async function PATCH(
     if (body.title !== undefined) updateData.title = String(body.title);
     if (body.date !== undefined) updateData.date = new Date(body.date);
     if (body.description !== undefined) {
-      updateData.description = typeof body.description === 'string' ? body.description : null;
+      // Handle description - accept string or object, stringify if object
+      if (body.description === null) {
+        updateData.description = null;
+      } else if (typeof body.description === 'string') {
+        updateData.description = body.description;
+      } else if (typeof body.description === 'object') {
+        updateData.description = JSON.stringify(body.description);
+      }
     }
 
     await db

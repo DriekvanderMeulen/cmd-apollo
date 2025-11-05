@@ -8,6 +8,7 @@ import { Button } from "@/components/ui";
 import { QRCodeCanvas } from "qrcode.react";
 import { VideoUpload } from "./video-upload";
 import { IterationForm } from "./iteration-form";
+import { TiptapEditor } from "./tiptap-editor";
 import Dialog from "@/components/ui/dialog";
 
 type ObjectRow = {
@@ -81,7 +82,7 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
   const [isPending, startTransition] = useTransition();
   const [data, setData] = useState<ObjectRow | null>(null);
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState<string>("");
+  const [description, setDescription] = useState<string | object | null>(null);
   const [collectionId, setCollectionId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [iterations, setIterations] = useState<Array<IterationRow>>([]);
@@ -106,11 +107,21 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
         if (cancelled) return;
         setData(row);
         setTitle(row.title);
-        // Convert existing rich text JSON to plain text if needed
-        const desc = typeof row.description === 'string' 
-          ? row.description 
-          : extractPlainText(row.description) || "";
-        setDescription(desc);
+        // Handle description - could be string or JSON object
+        if (row.description === null || row.description === '') {
+          setDescription(null);
+        } else if (typeof row.description === 'string') {
+          // Try to parse as JSON, if it fails, it's plain text
+          try {
+            const parsed = JSON.parse(row.description);
+            setDescription(parsed);
+          } catch {
+            // Plain text, keep as string (will be converted by editor)
+            setDescription(row.description);
+          }
+        } else {
+          setDescription(row.description);
+        }
         setCollectionId(row.collectionId ? String(row.collectionId) : "");
         setCategoryId(row.categoryId ? String(row.categoryId) : "");
         // load iterations
@@ -168,9 +179,18 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
     startTransition(() => {
       (async () => {
         try {
+          // Convert description to appropriate format
+          let descriptionValue: string | object | null = null;
+          if (description !== null) {
+            if (typeof description === 'string') {
+              descriptionValue = description.trim() || null;
+            } else {
+              descriptionValue = description;
+            }
+          }
           await apiJson(`/api/v1/objects/public/${publicId}`, "PATCH", {
             title: titleTrim || null,
-            description: description.trim() || null,
+            description: descriptionValue,
             collectionId: collectionId ? Number(collectionId) : undefined,
             categoryId: categoryId ? Number(categoryId) : null,
           });
@@ -225,7 +245,7 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
   const handleIterationSave = async (iterationData: {
     title: string;
     date: Date;
-    description: string | null;
+    description: string | object | null;
   }) => {
     try {
       if (editingIteration) {
@@ -330,10 +350,9 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
         <label className="block mb-1.5 text-sm font-medium text-neutral-700">
           Description
         </label>
-        <textarea
+        <TiptapEditor
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="min-h-[200px] w-full rounded-md px-3 py-2 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors resize-y"
+          onChange={(value) => setDescription(value)}
           placeholder="Enter object description..."
         />
       </div>
@@ -503,9 +522,19 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
                     id: editingIteration.id,
                     title: editingIteration.title,
                     date: new Date(editingIteration.date),
-                    description: typeof editingIteration.description === 'string' 
-                      ? editingIteration.description 
-                      : extractPlainText(editingIteration.description) || null,
+                    description: (() => {
+                      if (editingIteration.description === null || editingIteration.description === '') {
+                        return null;
+                      }
+                      if (typeof editingIteration.description === 'string') {
+                        try {
+                          return JSON.parse(editingIteration.description);
+                        } catch {
+                          return editingIteration.description;
+                        }
+                      }
+                      return editingIteration.description;
+                    })(),
                   }
                 : undefined
             }

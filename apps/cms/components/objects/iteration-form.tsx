@@ -3,47 +3,24 @@
 import { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import { Button } from "@/components/ui";
+import { TiptapEditor } from "./tiptap-editor";
 
 interface IterationFormProps {
   initialData?: {
     id?: number;
     title: string;
     date: Date;
-    description: string | null;
+    description: string | object | null;
   };
   onSave: (data: {
     title: string;
     date: Date;
-    description: string | null;
+    description: string | object | null;
   }) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
 }
 
-function extractPlainText(richText: unknown): string | null {
-	if (!richText) return null
-	if (typeof richText === 'string') return richText
-	if (typeof richText !== 'object') return null
-
-	type TipTapNode = {
-		type: string
-		content?: Array<TipTapNode>
-		text?: string
-	}
-
-	function extractTextFromNode(node: TipTapNode): string {
-		if (node.text) {
-			return node.text
-		}
-		if (node.content && Array.isArray(node.content)) {
-			return node.content.map(extractTextFromNode).join(' ')
-		}
-		return ''
-	}
-
-	const node = richText as TipTapNode
-	return extractTextFromNode(node).trim() || null
-}
 
 export function IterationForm({
   initialData,
@@ -53,8 +30,8 @@ export function IterationForm({
 }: IterationFormProps) {
   const [title, setTitle] = useState(initialData?.title || "");
   const [date, setDate] = useState<Date>(initialData?.date || new Date());
-  const [description, setDescription] = useState<string>(
-    initialData?.description || "",
+  const [description, setDescription] = useState<string | object | null>(
+    initialData?.description || null,
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -62,11 +39,21 @@ export function IterationForm({
     if (initialData) {
       setTitle(initialData.title);
       setDate(initialData.date);
-      // Convert existing rich text JSON to plain text if needed
-      const desc = typeof initialData.description === 'string' 
-        ? initialData.description 
-        : extractPlainText(initialData.description) || "";
-      setDescription(desc);
+      // Handle description - could be string or JSON object
+      if (initialData.description === null || initialData.description === '') {
+        setDescription(null);
+      } else if (typeof initialData.description === 'string') {
+        // Try to parse as JSON, if it fails, it's plain text
+        try {
+          const parsed = JSON.parse(initialData.description);
+          setDescription(parsed);
+        } catch {
+          // Plain text, keep as string (will be converted by editor)
+          setDescription(initialData.description);
+        }
+      } else {
+        setDescription(initialData.description);
+      }
     }
   }, [initialData]);
 
@@ -80,10 +67,19 @@ export function IterationForm({
 
     setIsSubmitting(true);
     try {
+      // Convert description to appropriate format
+      let descriptionValue: string | object | null = null;
+      if (description !== null) {
+        if (typeof description === 'string') {
+          descriptionValue = description.trim() || null;
+        } else {
+          descriptionValue = description;
+        }
+      }
       await onSave({
         title: titleTrim,
         date,
-        description: description.trim() || null,
+        description: descriptionValue,
       });
     } catch (error) {
       // Error handling is done in parent component
@@ -124,10 +120,9 @@ export function IterationForm({
         <label className="block mb-1.5 text-sm font-medium text-neutral-700">
           Description
         </label>
-        <textarea
+        <TiptapEditor
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="min-h-[200px] w-full rounded-md px-3 py-2 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors resize-y"
+          onChange={(value) => setDescription(value)}
           placeholder="Enter iteration description..."
         />
       </div>

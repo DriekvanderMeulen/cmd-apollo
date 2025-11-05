@@ -197,7 +197,14 @@ export async function PATCH(
   const data: any = {};
   if (typeof body.title === "string") data.title = body.title;
   if (body.description !== undefined) {
-    data.description = typeof body.description === 'string' ? body.description : null;
+    // Handle description - accept string or object, stringify if object
+    if (body.description === null) {
+      data.description = null;
+    } else if (typeof body.description === 'string') {
+      data.description = body.description;
+    } else if (typeof body.description === 'object') {
+      data.description = JSON.stringify(body.description);
+    }
   }
   if (typeof body.categoryId === "number" || body.categoryId === null)
     data.categoryId = body.categoryId;

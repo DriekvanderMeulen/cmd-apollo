@@ -11,7 +11,7 @@ export interface ObjectData {
 		id: number
 		publicId: string
 		title: string
-		description: unknown
+		description: string | object | null
 		collectionId: number
 		categoryId: number | null
 		cfR2Link: string | null
@@ -22,7 +22,7 @@ export interface ObjectData {
 		objectId: number
 		title: string
 		date: string
-		description: unknown
+		description: string | object | null
 		createdAt: string
 	}>
 	r2Files: Array<{

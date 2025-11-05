@@ -90,9 +90,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Handle description - accept string or object, stringify if object
+  let descriptionValue: string | null = null;
+  if (body.description !== null && body.description !== undefined) {
+    if (typeof body.description === 'string') {
+      descriptionValue = body.description || null;
+    } else if (typeof body.description === 'object') {
+      descriptionValue = JSON.stringify(body.description);
+    }
+  }
+
   const insert = await db.insert(objectTable).values({
     title: String(body.title),
-    description: typeof body.description === 'string' ? body.description : null,
+    description: descriptionValue,
     userId: user.id,
     collectionId: Number(body.collectionId),
     categoryId: body.categoryId ? Number(body.categoryId) : null,

@@ -63,12 +63,22 @@ export async function POST(
     );
   }
 
+  // Handle description - accept string or object, stringify if object
+  let descriptionValue: string | null = null;
+  if (body.description !== null && body.description !== undefined) {
+    if (typeof body.description === 'string') {
+      descriptionValue = body.description || null;
+    } else if (typeof body.description === 'object') {
+      descriptionValue = JSON.stringify(body.description);
+    }
+  }
+
   try {
     const insert = await db.insert(iterationTable).values({
       objectId: obj.id,
       title: String(body.title),
       date: new Date(body.date),
-      description: typeof body.description === 'string' ? body.description : null,
+      description: descriptionValue,
     });
 
     const insertId = (insert as any)?.insertId;

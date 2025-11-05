@@ -5,13 +5,13 @@ export type ObjectDetailIteration = {
 	id: number
 	title: string
 	date: string
-	description: unknown
+	description: string | object | null
 }
 
 export type ObjectDetailResponse = {
 	publicId: string
 	title: string
-	description: unknown
+	description: string | object | null
 	user: {
 		id: number
 		publicId: string | null
@@ -113,7 +113,7 @@ export async function fetchObjectData(publicId: string): Promise<ObjectData> {
 export type LibraryObject = {
 	publicId: string
 	title: string
-	description: unknown
+	description: string | object | null
 	user: {
 		id: number
 		publicId: string | null

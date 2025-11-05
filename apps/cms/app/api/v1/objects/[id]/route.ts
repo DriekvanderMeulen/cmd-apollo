@@ -43,8 +43,16 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   const data: any = {};
   if (typeof body.title === "string") data.title = body.title;
-  if (typeof body.description === "string" || body.description === null)
-    data.description = body.description;
+  if (body.description !== undefined) {
+    // Handle description - accept string or object, stringify if object
+    if (body.description === null) {
+      data.description = null;
+    } else if (typeof body.description === 'string') {
+      data.description = body.description;
+    } else if (typeof body.description === 'object') {
+      data.description = JSON.stringify(body.description);
+    }
+  }
   if (typeof body.categoryId === "number" || body.categoryId === null)
     data.categoryId = body.categoryId;
   if (typeof body.cfR2Link === "string" || body.cfR2Link === null)
