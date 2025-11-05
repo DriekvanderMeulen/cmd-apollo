@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { FlatList, StyleSheet, ActivityIndicator, View, RefreshControl, Pressable } from 'react-native'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -12,6 +12,7 @@ import {
 	fetchLibraryObjects,
 	fetchCollections,
 	fetchCategories,
+	fetchObjectDetail,
 	type LibraryObject,
 	type SortOption,
 } from '@/lib/api'
@@ -133,6 +134,41 @@ export default function LibraryScreen(): React.JSX.Element {
 		}
 	}
 
+	const handleViewableItemsChanged = useCallback(
+		({ viewableItems }: { viewableItems: Array<{ item: LibraryObject }> }) => {
+			// Prefetch details for visible items (up to 3 ahead)
+			viewableItems.slice(0, 3).forEach(({ item }) => {
+				const cachedData = queryClient.getQueryData<{ data: unknown; etag: string | null }>([
+					'object-detail',
+					item.publicId,
+				])
+				// Only prefetch if not already cached
+				if (!cachedData) {
+					queryClient.prefetchQuery({
+						queryKey: ['object-detail', item.publicId],
+						queryFn: async () => {
+							const result = await fetchObjectDetail(item.publicId)
+							if (result.notModified) {
+								// Should not happen on first fetch, but handle it
+								throw new Error('Unexpected 304 on initial fetch')
+							}
+							return { data: result.data, etag: result.etag }
+						},
+						staleTime: 5 * 60 * 1000, // 5 minutes
+					})
+				}
+			})
+		},
+		[queryClient]
+	)
+
+	const viewabilityConfig = useMemo(
+		() => ({
+			itemVisiblePercentThreshold: 50,
+		}),
+		[]
+	)
+
 	const renderItem = ({ item }: { item: LibraryObject }) => {
 		return <LibraryItem item={item} />
 	}
@@ -252,6 +288,8 @@ export default function LibraryScreen(): React.JSX.Element {
 					refreshControl={
 						<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
 					}
+					onViewableItemsChanged={handleViewableItemsChanged}
+					viewabilityConfig={viewabilityConfig}
 				/>
 			)}
 		</ScreenContainer>

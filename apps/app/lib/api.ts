@@ -1,6 +1,90 @@
 import { BEARER_TOKEN, CMS_API_URL } from '@/constants/config'
 import type { ObjectData } from './storage'
 
+export type ObjectDetailIteration = {
+	id: number
+	title: string
+	date: string
+	description: unknown
+}
+
+export type ObjectDetailResponse = {
+	publicId: string
+	title: string
+	description: unknown
+	user: {
+		id: number
+		publicId: string | null
+		givenName: string | null
+		familyName: string | null
+		email: string | null
+	}
+	collection: {
+		id: number | null
+		publicId: string | null
+		title: string | null
+	}
+	category: {
+		id: number
+		publicId: string | null
+		title: string
+	} | null
+	posterUrl: string | null
+	videoUrl: string | null
+	iterations: Array<ObjectDetailIteration>
+	version: string
+}
+
+export type FetchObjectDetailOptions = {
+	ifNoneMatch?: string
+}
+
+export type ObjectDetailResult =
+	| { data: ObjectDetailResponse; etag: string | null; notModified?: false }
+	| { data: null; etag: null; notModified: true }
+
+export async function fetchObjectDetail(
+	publicId: string,
+	options?: FetchObjectDetailOptions
+): Promise<ObjectDetailResult> {
+	const url = `${CMS_API_URL}/api/v1/objects/public/${publicId}`
+
+	const headers: Record<string, string> = {
+		Authorization: `Bearer ${BEARER_TOKEN}`,
+		'Content-Type': 'application/json',
+	}
+
+	if (options?.ifNoneMatch) {
+		headers['If-None-Match'] = options.ifNoneMatch
+	}
+
+	const response = await fetch(url, {
+		method: 'GET',
+		headers,
+	})
+
+	if (response.status === 304) {
+		// Not Modified - return special indicator
+		return { data: null, etag: null, notModified: true }
+	}
+
+	if (!response.ok) {
+		if (response.status === 401) {
+			throw new Error('Unauthorized: Invalid bearer token')
+		}
+		if (response.status === 404) {
+			throw new Error('Object not found')
+		}
+		throw new Error(`Failed to fetch object data: ${response.statusText}`)
+	}
+
+	const data = (await response.json()) as ObjectDetailResponse
+	const etag = response.headers.get('ETag')
+
+	return { data, etag, notModified: false }
+}
+
+// Legacy function for backward compatibility
 export async function fetchObjectData(publicId: string): Promise<ObjectData> {
 	const url = `${CMS_API_URL}/api/v1/app/objects/public/${publicId}/full`
 
