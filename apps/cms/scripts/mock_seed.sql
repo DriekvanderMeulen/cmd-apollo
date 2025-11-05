@@ -133,8 +133,8 @@ SELECT
 FROM tenants WHERE public_id = 'mock_tenant_2'
 ON CONFLICT DO NOTHING;
 
--- Insert mock objects (20 objects with realistic names, all with video_r2_key = '2/1/video')
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+-- Insert mock objects (20 objects with realistic names, all with video_r2_key = '2/1/video' and cf_r2_link = '2/1')
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_1',
   'STOP',
@@ -142,6 +142,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -152,7 +153,7 @@ WHERE u.public_id = 'mock_user_1'
   AND cat.public_id = 'mock_category_3'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_2',
   'Urban Rhythms',
@@ -160,6 +161,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -170,7 +172,7 @@ WHERE u.public_id = 'mock_user_2'
   AND cat.public_id = 'mock_category_1'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_3',
   'Echoes of Tomorrow',
@@ -178,6 +180,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -188,7 +191,7 @@ WHERE u.public_id = 'mock_user_3'
   AND cat.public_id = 'mock_category_3'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_4',
   'Digital Canvas',
@@ -196,6 +199,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -206,7 +210,7 @@ WHERE u.public_id = 'mock_user_4'
   AND cat.public_id = 'mock_category_4'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_5',
   'Metamorphosis',
@@ -214,6 +218,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -224,7 +229,7 @@ WHERE u.public_id = 'mock_user_5'
   AND cat.public_id = 'mock_category_2'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_6',
   'Virtual Landscapes',
@@ -232,6 +237,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -242,7 +248,7 @@ WHERE u.public_id = 'mock_user_6'
   AND cat.public_id = 'mock_category_6'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_7',
   'Light & Shadow',
@@ -250,6 +256,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -260,7 +267,7 @@ WHERE u.public_id = 'mock_user_1'
   AND cat.public_id = 'mock_category_1'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_8',
   'Nexus',
@@ -268,6 +275,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -278,7 +286,7 @@ WHERE u.public_id = 'mock_user_2'
   AND cat.public_id = 'mock_category_4'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_9',
   'Fragmented Memories',
@@ -286,6 +294,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -296,7 +305,7 @@ WHERE u.public_id = 'mock_user_3'
   AND cat.public_id = 'mock_category_2'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_10',
   'Synthetic Dreams',
@@ -304,6 +313,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -314,7 +324,7 @@ WHERE u.public_id = 'mock_user_4'
   AND cat.public_id = 'mock_category_5'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_11',
   'Chromatic Flow',
@@ -322,6 +332,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -332,7 +343,7 @@ WHERE u.public_id = 'mock_user_5'
   AND cat.public_id = 'mock_category_3'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_12',
   'Parallel Realities',
@@ -340,6 +351,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -350,7 +362,7 @@ WHERE u.public_id = 'mock_user_6'
   AND cat.public_id = 'mock_category_6'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_13',
   'Transient Moments',
@@ -358,6 +370,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -368,7 +381,7 @@ WHERE u.public_id = 'mock_user_1'
   AND cat.public_id = 'mock_category_1'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_14',
   'Code & Creativity',
@@ -376,6 +389,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -386,7 +400,7 @@ WHERE u.public_id = 'mock_user_2'
   AND cat.public_id = 'mock_category_4'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_15',
   'The Last Archive',
@@ -394,6 +408,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -404,7 +419,7 @@ WHERE u.public_id = 'mock_user_3'
   AND cat.public_id = 'mock_category_3'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_16',
   'Cinematic Portraits',
@@ -412,6 +427,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -422,7 +438,7 @@ WHERE u.public_id = 'mock_user_4'
   AND cat.public_id = 'mock_category_2'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_17',
   'Digital Sculptures',
@@ -430,6 +446,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -440,7 +457,7 @@ WHERE u.public_id = 'mock_user_5'
   AND cat.public_id = 'mock_category_5'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_18',
   'Interface Poetry',
@@ -448,6 +465,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -458,7 +476,7 @@ WHERE u.public_id = 'mock_user_6'
   AND cat.public_id = 'mock_category_3'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_19',
   'Ephemeral Bonds',
@@ -466,6 +484,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
@@ -476,7 +495,7 @@ WHERE u.public_id = 'mock_user_1'
   AND cat.public_id = 'mock_category_1'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, video_r2_key, public)
+INSERT INTO objects (public_id, title, description, user_id, collection_id, category_id, cf_r2_link, video_r2_key, public)
 SELECT 
   'mock_object_20',
   'Quantum Aesthetics',
@@ -484,6 +503,7 @@ SELECT
   u.id,
   c.id,
   cat.id,
+  '2/1',
   '2/1/video',
   true
 FROM users u
