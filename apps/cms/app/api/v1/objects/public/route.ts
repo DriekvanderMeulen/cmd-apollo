@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, like } from 'drizzle-orm'
+import { and, asc, count, desc, eq, inArray, like } from 'drizzle-orm'
 import { createHash } from 'crypto'
 import { db, objectTable, userTable, collectionTable, categoryTable } from '@/db'
 import { requireBearerToken } from '@/lib/bearerAuth'
@@ -49,16 +49,34 @@ export async function GET(req: Request): Promise<Response> {
 		wheres.push(like(objectTable.title, `%${search}%`))
 	}
 
-	// Parse filter parameter (e.g., "categoryId:1,collectionId:2")
+	// Parse filter parameter (e.g., "collectionId:1,2,3&categoryId:4,5")
+	// Format: collectionId:1,2,3&categoryId:4,5 (using & to separate filter groups)
 	if (filterParam) {
-		const filters = filterParam.split(',')
-		for (const filter of filters) {
-			const [key, value] = filter.split(':')
-			if (key === 'categoryId' && value) {
-				wheres.push(eq(objectTable.categoryId, Number(value)))
+		const filterGroups = filterParam.split('&')
+		for (const group of filterGroups) {
+			const [key, valuesStr] = group.split(':')
+			if (!valuesStr) continue
+
+			const values = valuesStr
+				.split(',')
+				.map((v) => Number(v.trim()))
+				.filter((v) => !isNaN(v) && v > 0)
+
+			if (values.length === 0) continue
+
+			if (key === 'categoryId') {
+				if (values.length === 1) {
+					wheres.push(eq(objectTable.categoryId, values[0]))
+				} else {
+					wheres.push(inArray(objectTable.categoryId, values))
+				}
 			}
-			if (key === 'collectionId' && value) {
-				wheres.push(eq(objectTable.collectionId, Number(value)))
+			if (key === 'collectionId') {
+				if (values.length === 1) {
+					wheres.push(eq(objectTable.collectionId, values[0]))
+				} else {
+					wheres.push(inArray(objectTable.collectionId, values))
+				}
 			}
 		}
 	}

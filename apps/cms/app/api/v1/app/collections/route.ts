@@ -1,9 +1,16 @@
 // app/api/app/collections/route.ts
-import { requireAuthContext } from "@/lib/authContext";
+import { requireBearerToken } from "@/lib/bearerAuth";
 import { db, collectionTable } from "@/db";
 
 export async function GET(req: Request): Promise<Response> {
-  await requireAuthContext(req);
+  try {
+    requireBearerToken(req);
+  } catch (error) {
+    if (error instanceof Response) {
+      return error;
+    }
+    return new Response("Unauthorized", { status: 401 });
+  }
 
   const rows = await db
     .select({

@@ -58,28 +58,106 @@ export type LibraryObjectsResponse = {
 	version: string
 }
 
-export type SortOption = 'newest' | 'alphabetical'
+export type SortOption = 'newest' | 'oldest' | 'alphabetical' | 'alphabetical-desc'
+
+export type Collection = {
+	id: number
+	publicId: string
+	title: string
+}
+
+export type Category = {
+	id: number
+	publicId: string
+	title: string
+}
 
 function getSortParam(sort: SortOption): string {
 	switch (sort) {
 		case 'newest':
 			return 'id:desc'
+		case 'oldest':
+			return 'id:asc'
 		case 'alphabetical':
 			return 'title:asc'
+		case 'alphabetical-desc':
+			return 'title:desc'
 		default:
 			return 'id:desc'
 	}
 }
 
+export async function fetchCollections(): Promise<Array<Collection>> {
+	const url = `${CMS_API_URL}/api/v1/app/collections`
+
+	const response = await fetch(url, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${BEARER_TOKEN}`,
+			'Content-Type': 'application/json',
+		},
+	})
+
+	if (!response.ok) {
+		if (response.status === 401) {
+			throw new Error('Unauthorized: Invalid bearer token')
+		}
+		throw new Error(`Failed to fetch collections: ${response.statusText}`)
+	}
+
+	const data = await response.json()
+	return data.data as Array<Collection>
+}
+
+export async function fetchCategories(): Promise<Array<Category>> {
+	const url = `${CMS_API_URL}/api/v1/app/categories`
+
+	const response = await fetch(url, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${BEARER_TOKEN}`,
+			'Content-Type': 'application/json',
+		},
+	})
+
+	if (!response.ok) {
+		if (response.status === 401) {
+			throw new Error('Unauthorized: Invalid bearer token')
+		}
+		throw new Error(`Failed to fetch categories: ${response.statusText}`)
+	}
+
+	const data = await response.json()
+	return data.data as Array<Category>
+}
+
 export async function fetchLibraryObjects(
 	page: number = 1,
 	pageSize: number = 20,
-	sort: SortOption = 'newest'
+	sort: SortOption = 'newest',
+	collectionIds?: Array<number>,
+	categoryIds?: Array<number>,
+	search?: string
 ): Promise<LibraryObjectsResponse> {
 	const url = new URL(`${CMS_API_URL}/api/v1/objects/public`)
 	url.searchParams.set('page', String(page))
 	url.searchParams.set('pageSize', String(pageSize))
 	url.searchParams.set('sort', getSortParam(sort))
+
+	if (search && search.trim().length > 0) {
+		url.searchParams.set('search', search.trim())
+	}
+
+	const filterParts: Array<string> = []
+	if (collectionIds && collectionIds.length > 0) {
+		filterParts.push(`collectionId:${collectionIds.join(',')}`)
+	}
+	if (categoryIds && categoryIds.length > 0) {
+		filterParts.push(`categoryId:${categoryIds.join(',')}`)
+	}
+	if (filterParts.length > 0) {
+		url.searchParams.set('filter', filterParts.join('&'))
+	}
 
 	const response = await fetch(url.toString(), {
 		method: 'GET',
