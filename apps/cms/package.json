@@ -10,7 +10,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:push": "drizzle-kit push",
     "db:push:railway": "NODE_ENV=production drizzle-kit push",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "db:mock:seed": "tsx scripts/mock-seed.ts",
+    "db:mock:remove": "tsx scripts/mock-remove.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.890.0",
