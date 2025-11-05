@@ -58,14 +58,28 @@ export type LibraryObjectsResponse = {
 	version: string
 }
 
+export type SortOption = 'newest' | 'alphabetical'
+
+function getSortParam(sort: SortOption): string {
+	switch (sort) {
+		case 'newest':
+			return 'id:desc'
+		case 'alphabetical':
+			return 'title:asc'
+		default:
+			return 'id:desc'
+	}
+}
+
 export async function fetchLibraryObjects(
 	page: number = 1,
-	pageSize: number = 20
+	pageSize: number = 20,
+	sort: SortOption = 'newest'
 ): Promise<LibraryObjectsResponse> {
 	const url = new URL(`${CMS_API_URL}/api/v1/objects/public`)
 	url.searchParams.set('page', String(page))
 	url.searchParams.set('pageSize', String(pageSize))
-	url.searchParams.set('sort', 'id:desc')
+	url.searchParams.set('sort', getSortParam(sort))
 
 	const response = await fetch(url.toString(), {
 		method: 'GET',

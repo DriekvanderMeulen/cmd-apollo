@@ -1,17 +1,20 @@
-import React from 'react'
-import { FlatList, StyleSheet, ActivityIndicator } from 'react-native'
+import React, { useState } from 'react'
+import { FlatList, StyleSheet, ActivityIndicator, View } from 'react-native'
 import { useInfiniteQuery } from '@tanstack/react-query'
 
 import { ScreenContainer } from '@/src/components/ScreenContainer'
 import { LibraryItem } from '@/src/components/LibraryItem'
 import { LibraryItemSkeleton } from '@/src/components/LibraryItemSkeleton'
-import { fetchLibraryObjects, type LibraryObject } from '@/lib/api'
+import { SortSelector } from '@/src/components/SortSelector'
+import { fetchLibraryObjects, type LibraryObject, type SortOption } from '@/lib/api'
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 
 const PAGE_SIZE = 20
 
 export default function LibraryScreen(): React.JSX.Element {
+	const [sort, setSort] = useState<SortOption>('newest')
+
 	const {
 		data,
 		fetchNextPage,
@@ -21,8 +24,8 @@ export default function LibraryScreen(): React.JSX.Element {
 		isError,
 		error,
 	} = useInfiniteQuery({
-		queryKey: ['library-objects'],
-		queryFn: ({ pageParam = 1 }) => fetchLibraryObjects(pageParam, PAGE_SIZE),
+		queryKey: ['library-objects', sort],
+		queryFn: ({ pageParam = 1 }) => fetchLibraryObjects(pageParam, PAGE_SIZE, sort),
 		getNextPageParam: (lastPage) => {
 			const totalPages = Math.ceil(lastPage.total / lastPage.pageSize)
 			const nextPage = lastPage.page + 1
@@ -71,6 +74,9 @@ export default function LibraryScreen(): React.JSX.Element {
 
 	return (
 		<ScreenContainer title="Library">
+			<View style={styles.header}>
+				<SortSelector value={sort} onChange={setSort} />
+			</View>
 			{isLoading && items.length === 0 ? (
 				<ThemedView style={styles.emptyContainer}>
 					<LibraryItemSkeleton />
@@ -95,6 +101,10 @@ export default function LibraryScreen(): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
+	header: {
+		marginBottom: 16,
+		alignItems: 'flex-end',
+	},
 	listContent: {
 		paddingBottom: 16,
 	},
