@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
-import { RichTextEditor } from "@/components/editor/rich-text-editor";
 import { Button } from "@/components/ui";
 
 interface IterationFormProps {
@@ -10,15 +9,40 @@ interface IterationFormProps {
     id?: number;
     title: string;
     date: Date;
-    description: any;
+    description: string | null;
   };
   onSave: (data: {
     title: string;
     date: Date;
-    description: any;
+    description: string | null;
   }) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
+}
+
+function extractPlainText(richText: unknown): string | null {
+	if (!richText) return null
+	if (typeof richText === 'string') return richText
+	if (typeof richText !== 'object') return null
+
+	type TipTapNode = {
+		type: string
+		content?: Array<TipTapNode>
+		text?: string
+	}
+
+	function extractTextFromNode(node: TipTapNode): string {
+		if (node.text) {
+			return node.text
+		}
+		if (node.content && Array.isArray(node.content)) {
+			return node.content.map(extractTextFromNode).join(' ')
+		}
+		return ''
+	}
+
+	const node = richText as TipTapNode
+	return extractTextFromNode(node).trim() || null
 }
 
 export function IterationForm({
@@ -29,8 +53,8 @@ export function IterationForm({
 }: IterationFormProps) {
   const [title, setTitle] = useState(initialData?.title || "");
   const [date, setDate] = useState<Date>(initialData?.date || new Date());
-  const [description, setDescription] = useState<any>(
-    initialData?.description || null,
+  const [description, setDescription] = useState<string>(
+    initialData?.description || "",
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,7 +62,11 @@ export function IterationForm({
     if (initialData) {
       setTitle(initialData.title);
       setDate(initialData.date);
-      setDescription(initialData.description);
+      // Convert existing rich text JSON to plain text if needed
+      const desc = typeof initialData.description === 'string' 
+        ? initialData.description 
+        : extractPlainText(initialData.description) || "";
+      setDescription(desc);
     }
   }, [initialData]);
 
@@ -55,7 +83,7 @@ export function IterationForm({
       await onSave({
         title: titleTrim,
         date,
-        description,
+        description: description.trim() || null,
       });
     } catch (error) {
       // Error handling is done in parent component
@@ -96,11 +124,11 @@ export function IterationForm({
         <label className="block mb-1.5 text-sm font-medium text-neutral-700">
           Description
         </label>
-        <RichTextEditor
-          content={description}
-          onChange={setDescription}
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="min-h-[200px] w-full rounded-md px-3 py-2 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors resize-y"
           placeholder="Enter iteration description..."
-          className="min-h-[200px]"
         />
       </div>
 

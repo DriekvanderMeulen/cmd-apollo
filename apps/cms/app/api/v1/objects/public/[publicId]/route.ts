@@ -14,6 +14,7 @@ import {
 } from "@/db/schema";
 import { validateRequest } from "@/server/auth/validate";
 import { requireBearerToken } from "@/lib/bearerAuth";
+import { requireAuthContext } from "@/lib/authContext";
 import { R2_BUCKET_NAME, createR2Client } from "@/server/clients/r2";
 
 function generateETag(data: unknown): string {
@@ -54,12 +55,19 @@ export async function GET(
   { params }: { params: Promise<{ publicId: string }> },
 ): Promise<Response> {
 	try {
+		// Try bearer token first (for mobile app)
 		requireBearerToken(req)
 	} catch (error) {
-		if (error instanceof Response) {
-			return error
+		// If bearer token fails, try session auth (for CMS)
+		try {
+			await requireAuthContext(req)
+		} catch (sessionError) {
+			// Both auth methods failed, return error
+			if (sessionError instanceof Response) {
+				return sessionError
+			}
+			return new Response('Unauthorized', { status: 401 })
 		}
-		return new Response('Unauthorized', { status: 401 })
 	}
 
 	const { publicId } = await params
@@ -188,7 +196,9 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   const data: any = {};
   if (typeof body.title === "string") data.title = body.title;
-  if (body.description !== undefined) data.description = body.description; // Allow JSON or null
+  if (body.description !== undefined) {
+    data.description = typeof body.description === 'string' ? body.description : null;
+  }
   if (typeof body.categoryId === "number" || body.categoryId === null)
     data.categoryId = body.categoryId;
   if (typeof body.collectionId === "number") {

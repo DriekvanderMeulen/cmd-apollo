@@ -6,7 +6,6 @@ import { toast } from "react-hot-toast";
 
 import { Button } from "@/components/ui";
 import { QRCodeCanvas } from "qrcode.react";
-import { RichTextEditor } from "@/components/editor/rich-text-editor";
 import { VideoUpload } from "./video-upload";
 import { IterationForm } from "./iteration-form";
 import Dialog from "@/components/ui/dialog";
@@ -15,7 +14,7 @@ type ObjectRow = {
   id: number;
   publicId: string;
   title: string;
-  description: any;
+  description: string | null;
   collectionId: number;
   categoryId: number | null;
   cfR2Link: string | null;
@@ -28,9 +27,34 @@ type IterationRow = {
   objectId: number;
   title: string;
   date: string;
-  description: any;
+  description: string | null;
   createdAt: string;
-};
+}
+
+function extractPlainText(richText: unknown): string | null {
+	if (!richText) return null
+	if (typeof richText === 'string') return richText
+	if (typeof richText !== 'object') return null
+
+	type TipTapNode = {
+		type: string
+		content?: Array<TipTapNode>
+		text?: string
+	}
+
+	function extractTextFromNode(node: TipTapNode): string {
+		if (node.text) {
+			return node.text
+		}
+		if (node.content && Array.isArray(node.content)) {
+			return node.content.map(extractTextFromNode).join(' ')
+		}
+		return ''
+	}
+
+	const node = richText as TipTapNode
+	return extractTextFromNode(node).trim() || null
+}
 
 async function apiGet(path: string) {
   const res = await fetch(path, { cache: "no-store" });
@@ -57,7 +81,7 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
   const [isPending, startTransition] = useTransition();
   const [data, setData] = useState<ObjectRow | null>(null);
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState<any>(null);
+  const [description, setDescription] = useState<string>("");
   const [collectionId, setCollectionId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [iterations, setIterations] = useState<Array<IterationRow>>([]);
@@ -82,7 +106,11 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
         if (cancelled) return;
         setData(row);
         setTitle(row.title);
-        setDescription(row.description);
+        // Convert existing rich text JSON to plain text if needed
+        const desc = typeof row.description === 'string' 
+          ? row.description 
+          : extractPlainText(row.description) || "";
+        setDescription(desc);
         setCollectionId(row.collectionId ? String(row.collectionId) : "");
         setCategoryId(row.categoryId ? String(row.categoryId) : "");
         // load iterations
@@ -142,7 +170,7 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
         try {
           await apiJson(`/api/v1/objects/public/${publicId}`, "PATCH", {
             title: titleTrim || null,
-            description: description,
+            description: description.trim() || null,
             collectionId: collectionId ? Number(collectionId) : undefined,
             categoryId: categoryId ? Number(categoryId) : null,
           });
@@ -197,7 +225,7 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
   const handleIterationSave = async (iterationData: {
     title: string;
     date: Date;
-    description: any;
+    description: string | null;
   }) => {
     try {
       if (editingIteration) {
@@ -302,9 +330,10 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
         <label className="block mb-1.5 text-sm font-medium text-neutral-700">
           Description
         </label>
-        <RichTextEditor
-          content={description}
-          onChange={setDescription}
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="min-h-[200px] w-full rounded-md px-3 py-2 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors resize-y"
           placeholder="Enter object description..."
         />
       </div>
@@ -414,22 +443,13 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
                     </Button>
                   </div>
                 </div>
-                {iteration.description && (
-                  <div className="prose prose-sm max-w-none">
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html:
-                          iteration.description?.content
-                            ?.map((node: any) =>
-                              node.type === "paragraph"
-                                ? `<p>${node.content?.[0]?.text || ""}</p>`
-                                : "",
-                            )
-                            .join("") || "",
-                      }}
-                    />
-                  </div>
-                )}
+                {iteration.description ? (
+                  <p className="text-sm text-neutral-700 whitespace-pre-wrap">
+                    {typeof iteration.description === 'string' 
+                      ? iteration.description 
+                      : extractPlainText(iteration.description) || ''}
+                  </p>
+                ) : null}
               </div>
             ))}
           </div>
@@ -483,7 +503,9 @@ export function ObjectDetail({ publicId }: { publicId: string }) {
                     id: editingIteration.id,
                     title: editingIteration.title,
                     date: new Date(editingIteration.date),
-                    description: editingIteration.description,
+                    description: typeof editingIteration.description === 'string' 
+                      ? editingIteration.description 
+                      : extractPlainText(editingIteration.description) || null,
                   }
                 : undefined
             }

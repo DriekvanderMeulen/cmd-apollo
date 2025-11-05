@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
 
   const insert = await db.insert(objectTable).values({
     title: String(body.title),
-    description: body.description || null, // Store as JSON
+    description: typeof body.description === 'string' ? body.description : null,
     userId: user.id,
     collectionId: Number(body.collectionId),
     categoryId: body.categoryId ? Number(body.categoryId) : null,

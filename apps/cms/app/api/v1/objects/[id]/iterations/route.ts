@@ -70,7 +70,7 @@ export async function POST(
       objectId: id,
       title: String(body.title),
       date: new Date(body.date),
-      description: body.description || null,
+      description: typeof body.description === 'string' ? body.description : null,
     });
 
     const insertId = (insert as any)?.insertId;

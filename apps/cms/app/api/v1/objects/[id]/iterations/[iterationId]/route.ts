@@ -49,8 +49,9 @@ export async function PATCH(
     const updateData: any = {};
     if (body.title !== undefined) updateData.title = String(body.title);
     if (body.date !== undefined) updateData.date = new Date(body.date);
-    if (body.description !== undefined)
-      updateData.description = body.description;
+    if (body.description !== undefined) {
+      updateData.description = typeof body.description === 'string' ? body.description : null;
+    }
 
     await db
       .update(iterationTable)

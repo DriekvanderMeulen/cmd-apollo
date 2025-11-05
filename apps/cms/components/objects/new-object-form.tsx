@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 import { Button, Spinner } from "@/components/ui";
-import { RichTextEditor } from "@/components/editor/rich-text-editor";
 import { VideoUpload } from "./video-upload";
 
 async function apiJson(
@@ -26,7 +25,7 @@ export function NewObjectForm() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState<any>(null);
+  const [description, setDescription] = useState<string>("");
   const [collectionId, setCollectionId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [collections, setCollections] = useState<
@@ -74,7 +73,7 @@ export function NewObjectForm() {
         try {
           const create = await apiJson("/api/v1/objects", "POST", {
             title: titleTrim,
-            description: description,
+            description: description.trim() || null,
             collectionId: collectionNum,
             categoryId: categoryId ? Number(categoryId) : null,
             public: isPublic,
@@ -121,9 +120,10 @@ export function NewObjectForm() {
         <label className="block mb-1.5 text-sm font-medium text-neutral-700">
           Description
         </label>
-        <RichTextEditor
-          content={description}
-          onChange={setDescription}
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="min-h-[200px] w-full rounded-md px-3 py-2 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors resize-y"
           placeholder="Enter object description..."
         />
       </div>

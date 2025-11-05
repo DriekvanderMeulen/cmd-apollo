@@ -6,7 +6,6 @@ import {
   text,
   varchar,
   timestamp,
-  jsonb,
 } from "drizzle-orm/pg-core";
 
 import { objectTable } from "./object";
@@ -22,7 +21,7 @@ export const iterationTable = pgTable(
       length: 255,
     }).notNull(),
     date: timestamp("date").notNull(),
-    description: jsonb("description"),
+    description: text("description"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (t) => ({

@@ -7,7 +7,6 @@ import {
   unique,
   varchar,
   boolean,
-  jsonb,
 } from "drizzle-orm/pg-core";
 
 import { nanoid } from "../id";
@@ -27,7 +26,7 @@ export const objectTable = pgTable(
     title: varchar("title", {
       length: 255,
     }).notNull(),
-    description: jsonb("description"),
+    description: text("description"),
     userId: integer("user_id")
       .notNull()
       .references(() => userTable.id, { onDelete: "cascade" }),
