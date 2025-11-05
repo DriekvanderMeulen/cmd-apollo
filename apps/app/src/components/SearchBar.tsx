@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, TextInput, View, Pressable } from 'react-native'
-import { useColorScheme } from '@/hooks/use-color-scheme'
+import { useTheme } from '@/src/providers/ThemeProvider'
 import { Colors } from '@/constants/theme'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 
@@ -15,15 +15,15 @@ export function SearchBar({
 	onChangeText,
 	placeholder = 'Search...',
 }: SearchBarProps): React.JSX.Element {
-	const theme = useColorScheme() ?? 'light'
-	const isDark = theme === 'dark'
+	const { resolvedTheme, isOLED } = useTheme()
+	const isDark = resolvedTheme === 'dark'
 
 	return (
 		<View
 			style={[
 				styles.container,
 				{
-					backgroundColor: isDark ? '#1f1f1f' : '#f5f5f5',
+					backgroundColor: isDark ? (isOLED ? '#000000' : '#1f1f1f') : '#f5f5f5',
 					borderColor: isDark ? '#333' : '#e0e0e0',
 				},
 			]}

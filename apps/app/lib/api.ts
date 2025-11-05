@@ -159,21 +159,28 @@ export async function fetchLibraryObjects(
 		url.searchParams.set('filter', filterParts.join('&'))
 	}
 
-	const response = await fetch(url.toString(), {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${BEARER_TOKEN}`,
-			'Content-Type': 'application/json',
-		},
-	})
+	try {
+		const response = await fetch(url.toString(), {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${BEARER_TOKEN}`,
+				'Content-Type': 'application/json',
+			},
+		})
 
-	if (!response.ok) {
-		if (response.status === 401) {
-			throw new Error('Unauthorized: Invalid bearer token')
+		if (!response.ok) {
+			if (response.status === 401) {
+				throw new Error('Unauthorized: Invalid bearer token')
+			}
+			throw new Error(`Failed to fetch library objects: ${response.statusText}`)
 		}
-		throw new Error(`Failed to fetch library objects: ${response.statusText}`)
-	}
 
-	const data = await response.json()
-	return data as LibraryObjectsResponse
+		const data = await response.json()
+		return data as LibraryObjectsResponse
+	} catch (error) {
+		if (error instanceof TypeError && error.message.includes('fetch')) {
+			throw new Error('Network request failed. Please check your internet connection.')
+		}
+		throw error
+	}
 }

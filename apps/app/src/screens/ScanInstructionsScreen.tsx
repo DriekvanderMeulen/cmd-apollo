@@ -1,15 +1,24 @@
 import React from 'react'
-import { Text } from 'react-native'
+import { StyleSheet } from 'react-native'
 
 import { ScreenContainer } from '../components/ScreenContainer'
+import { ThemedText } from '../../components/themed-text'
 import { PingStatus } from '../../components/PingStatus'
 
 export function ScanInstructionsScreen(): React.JSX.Element {
 	return (
 		<ScreenContainer title="Scan Instructions">
-			<Text>Provide clear steps that guide users through scanning a new item.</Text>
-			<Text style={{ marginTop: 16, fontWeight: '600' }}>CMS Ping</Text>
+			<ThemedText>Provide clear steps that guide users through scanning a new item.</ThemedText>
+			<ThemedText style={styles.pingTitle} type="defaultSemiBold">
+				CMS Ping
+			</ThemedText>
 			<PingStatus />
 		</ScreenContainer>
 	)
 }
+
+const styles = StyleSheet.create({
+	pingTitle: {
+		marginTop: 16,
+	},
+})

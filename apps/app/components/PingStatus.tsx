@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { Text, View } from 'react-native'
+import { View, StyleSheet } from 'react-native'
+import { ThemedText } from './themed-text'
 import { api } from '@/src/api/http'
 
 export function PingStatus() {
@@ -8,13 +9,24 @@ export function PingStatus() {
 		queryFn: () => api.get('/api/ping'),
 	})
 
-	if (isLoading) return <Text>Loading…</Text>
-	if (error) return <Text>Failed to load ping</Text>
+	if (isLoading) return <ThemedText>Loading…</ThemedText>
+	if (error) return <ThemedText>Failed to load ping</ThemedText>
 
 	return (
-		<View>
-			<Text>Ping:</Text>
-			<Text>{typeof data === 'string' ? data : JSON.stringify(data)}</Text>
+		<View style={styles.container}>
+			<ThemedText>Ping:</ThemedText>
+			<ThemedText style={styles.value}>
+				{typeof data === 'string' ? data : JSON.stringify(data)}
+			</ThemedText>
 		</View>
 	)
 }
+
+const styles = StyleSheet.create({
+	container: {
+		marginTop: 8,
+	},
+	value: {
+		marginTop: 4,
+	},
+})

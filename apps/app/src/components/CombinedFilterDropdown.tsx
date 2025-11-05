@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import { IconSymbol } from '@/components/ui/icon-symbol'
 import { Colors } from '@/constants/theme'
-import { useColorScheme } from '@/hooks/use-color-scheme'
+import { useTheme } from '@/src/providers/ThemeProvider'
 import { fetchCollections, fetchCategories, type Collection, type Category } from '@/lib/api'
 
 type CombinedFilterDropdownProps = {
@@ -29,7 +29,7 @@ export function CombinedFilterDropdown({
 	const [triggerHeight, setTriggerHeight] = useState(0)
 	const [triggerX, setTriggerX] = useState(0)
 	const triggerRef = useRef<View>(null)
-	const theme = useColorScheme() ?? 'light'
+	const { resolvedTheme: theme, isOLED } = useTheme()
 
 	const { data: collections, isLoading: isLoadingCollections } = useQuery({
 		queryKey: ['collections'],
@@ -101,7 +101,11 @@ export function CombinedFilterDropdown({
 				}}
 				style={[
 					styles.trigger,
-					{ borderColor: theme === 'light' ? '#e0e0e0' : '#333' },
+					{
+						backgroundColor:
+							theme === 'light' ? '#fff' : isOLED ? '#000000' : Colors.dark.background,
+						borderColor: theme === 'light' ? '#e0e0e0' : '#333',
+					},
 				]}
 				onPress={() => onOpenChange(!isOpen)}
 				accessibilityRole="button"
@@ -147,8 +151,22 @@ export function CombinedFilterDropdown({
 						]}
 						onStartShouldSetResponder={() => true}
 					>
-						<ThemedView style={styles.dropdown}>
-							<View style={styles.dropdownHeader}>
+						<ThemedView
+							style={[
+								styles.dropdown,
+							{
+								backgroundColor:
+									theme === 'light' ? '#fff' : isOLED ? '#000000' : Colors.dark.background,
+								borderColor: theme === 'light' ? '#e0e0e0' : '#333',
+							},
+							]}
+						>
+							<View
+								style={[
+									styles.dropdownHeader,
+									{ borderBottomColor: theme === 'light' ? '#e0e0e0' : '#333' },
+								]}
+							>
 								<ThemedText type="defaultSemiBold" style={styles.dropdownTitle}>
 									Filters
 								</ThemedText>
@@ -175,7 +193,15 @@ export function CombinedFilterDropdown({
 													return (
 														<TouchableOpacity
 															key={collection.id}
-															style={[styles.option, isSelected ? styles.optionSelected : undefined]}
+															style={[
+																styles.option,
+																isSelected
+																	? {
+																			backgroundColor:
+																				theme === 'light' ? '#f0f8fa' : '#2a2a2a',
+																		}
+																	: undefined,
+															]}
 															onPress={() => handleToggleCollection(collection.id)}
 															accessibilityRole="checkbox"
 															accessibilityState={{ checked: isSelected }}
@@ -197,7 +223,15 @@ export function CombinedFilterDropdown({
 																		color="#0a7ea4"
 																	/>
 																) : (
-																	<View style={styles.checkboxEmpty} />
+																	<View
+																		style={[
+																			styles.checkboxEmpty,
+																			{
+																				borderColor:
+																					theme === 'light' ? '#ddd' : '#555',
+																			},
+																		]}
+																	/>
 																)}
 															</View>
 														</TouchableOpacity>
@@ -216,7 +250,15 @@ export function CombinedFilterDropdown({
 													return (
 														<TouchableOpacity
 															key={category.id}
-															style={[styles.option, isSelected ? styles.optionSelected : undefined]}
+															style={[
+																styles.option,
+																isSelected
+																	? {
+																			backgroundColor:
+																				theme === 'light' ? '#f0f8fa' : '#2a2a2a',
+																		}
+																	: undefined,
+															]}
 															onPress={() => handleToggleCategory(category.id)}
 															accessibilityRole="checkbox"
 															accessibilityState={{ checked: isSelected }}
@@ -238,7 +280,15 @@ export function CombinedFilterDropdown({
 																		color="#0a7ea4"
 																	/>
 																) : (
-																	<View style={styles.checkboxEmpty} />
+																	<View
+																		style={[
+																			styles.checkboxEmpty,
+																			{
+																				borderColor:
+																					theme === 'light' ? '#ddd' : '#555',
+																			},
+																		]}
+																	/>
 																)}
 															</View>
 														</TouchableOpacity>
@@ -302,10 +352,8 @@ const styles = StyleSheet.create({
 		zIndex: 1001,
 	},
 	dropdown: {
-		backgroundColor: '#fff',
 		borderRadius: 8,
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.2,
@@ -321,7 +369,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingVertical: 12,
 		borderBottomWidth: 1,
-		borderBottomColor: '#e0e0e0',
 	},
 	dropdownTitle: {
 		fontSize: 16,
@@ -355,7 +402,7 @@ const styles = StyleSheet.create({
 		minHeight: 44,
 	},
 	optionSelected: {
-		backgroundColor: '#f0f8fa',
+		// Dynamic backgroundColor based on theme
 	},
 	optionText: {
 		flex: 1,
@@ -377,7 +424,7 @@ const styles = StyleSheet.create({
 		height: 20,
 		borderRadius: 4,
 		borderWidth: 2,
-		borderColor: '#ddd',
+		// Dynamic borderColor based on theme
 	},
 	loadingContainer: {
 		paddingVertical: 24,

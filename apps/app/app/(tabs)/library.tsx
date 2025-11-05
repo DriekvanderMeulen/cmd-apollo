@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { FlatList, StyleSheet, ActivityIndicator, View } from 'react-native'
+import { FlatList, StyleSheet, ActivityIndicator, View, RefreshControl, Pressable } from 'react-native'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 
 import { ScreenContainer } from '@/src/components/ScreenContainer'
@@ -20,12 +20,26 @@ import { ThemedView } from '@/components/themed-view'
 
 const PAGE_SIZE = 20
 
+function isNetworkError(error: unknown): boolean {
+	if (!(error instanceof Error)) return false
+	const message = error.message.toLowerCase()
+	return (
+		message.includes('network') ||
+		message.includes('fetch') ||
+		message.includes('failed to fetch') ||
+		message.includes('network request failed') ||
+		message.includes('offline') ||
+		message.includes('internet connection')
+	)
+}
+
 export default function LibraryScreen(): React.JSX.Element {
 	const [sort, setSort] = useState<SortOption>('newest')
 	const [selectedCollectionIds, setSelectedCollectionIds] = useState<Array<number>>([])
 	const [selectedCategoryIds, setSelectedCategoryIds] = useState<Array<number>>([])
 	const [openDropdown, setOpenDropdown] = useState<'filter' | 'sort' | null>(null)
 	const [searchInput, setSearchInput] = useState('')
+	const [refreshing, setRefreshing] = useState(false)
 	const queryClient = useQueryClient()
 
 	// Prefetch collections and categories on load with 24-hour cache
@@ -52,6 +66,7 @@ export default function LibraryScreen(): React.JSX.Element {
 		isLoading,
 		isError,
 		error,
+		refetch,
 	} = useInfiniteQuery({
 		queryKey: ['library-objects', sort, selectedCollectionIds, selectedCategoryIds],
 		queryFn: ({ pageParam = 1 }) =>
@@ -88,6 +103,30 @@ export default function LibraryScreen(): React.JSX.Element {
 		})
 	}, [allItems, searchInput])
 
+	const hasActiveFilters = selectedCollectionIds.length > 0 || selectedCategoryIds.length > 0
+	const hasSearchQuery = searchInput.trim().length > 0
+	// Empty from filters: items filtered out by local search, or API returned no results with active filters
+	const isEmptyFromFilters =
+		items.length === 0 &&
+		!isLoading &&
+		!isError &&
+		(hasSearchQuery || (allItems.length === 0 && hasActiveFilters))
+	// Truly empty: no items at all, no filters, no search
+	const isEmptyList = items.length === 0 && !isLoading && !isError && !hasActiveFilters && !hasSearchQuery
+
+	const handleRefresh = async () => {
+		setRefreshing(true)
+		try {
+			await refetch()
+		} finally {
+			setRefreshing(false)
+		}
+	}
+
+	const handleRetry = () => {
+		refetch()
+	}
+
 	const handleLoadMore = () => {
 		if (hasNextPage && !isFetchingNextPage) {
 			fetchNextPage()
@@ -109,19 +148,55 @@ export default function LibraryScreen(): React.JSX.Element {
 
 	const renderEmpty = () => {
 		if (isError) {
+			const isOffline = isNetworkError(error)
 			return (
 				<ThemedView style={styles.emptyContainer}>
+					<ThemedText style={styles.errorTitle} type="subtitle">
+						{isOffline ? 'You\'re offline' : 'Something went wrong'}
+					</ThemedText>
 					<ThemedText style={styles.errorText}>
-						{error instanceof Error ? error.message : 'Failed to load library items'}
+						{isOffline
+							? 'Please check your internet connection and try again.'
+							: error instanceof Error
+								? error.message
+								: 'Failed to load library items'}
+					</ThemedText>
+					<Pressable onPress={handleRetry} style={styles.retryButton}>
+						<ThemedText style={styles.retryButtonText}>Retry</ThemedText>
+					</Pressable>
+				</ThemedView>
+			)
+		}
+
+		if (isEmptyFromFilters) {
+			return (
+				<ThemedView style={styles.emptyContainer}>
+					<ThemedText style={styles.emptyTitle} type="subtitle">
+						No items match your filters
+					</ThemedText>
+					<ThemedText style={styles.emptyText}>
+						{hasSearchQuery
+							? 'Try adjusting your search or filters to see more results.'
+							: 'Try adjusting your filters to see more results.'}
 					</ThemedText>
 				</ThemedView>
 			)
 		}
-		return (
-			<ThemedView style={styles.emptyContainer}>
-				<ThemedText>No items found</ThemedText>
-			</ThemedView>
-		)
+
+		if (isEmptyList) {
+			return (
+				<ThemedView style={styles.emptyContainer}>
+					<ThemedText style={styles.emptyTitle} type="subtitle">
+						No items yet
+					</ThemedText>
+					<ThemedText style={styles.emptyText}>
+						Scan items to add them to your library.
+					</ThemedText>
+				</ThemedView>
+			)
+		}
+
+		return null
 	}
 
 	return (
@@ -155,8 +230,8 @@ export default function LibraryScreen(): React.JSX.Element {
 					</View>
 				</View>
 			</View>
-			{isLoading && items.length === 0 ? (
-				<ThemedView style={styles.emptyContainer}>
+			{isLoading && items.length === 0 && !isError ? (
+				<ThemedView style={styles.skeletonContainer}>
 					<LibraryItemSkeleton />
 					<LibraryItemSkeleton />
 					<LibraryItemSkeleton />
@@ -170,8 +245,13 @@ export default function LibraryScreen(): React.JSX.Element {
 					onEndReachedThreshold={0.5}
 					ListFooterComponent={renderFooter}
 					ListEmptyComponent={renderEmpty}
-					contentContainerStyle={styles.listContent}
+					contentContainerStyle={
+						items.length === 0 ? styles.listContentEmpty : styles.listContent
+					}
 					showsVerticalScrollIndicator={false}
+					refreshControl={
+						<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+					}
 				/>
 			)}
 		</ScreenContainer>
@@ -195,18 +275,51 @@ const styles = StyleSheet.create({
 	listContent: {
 		paddingBottom: 16,
 	},
+	listContentEmpty: {
+		flexGrow: 1,
+		paddingBottom: 16,
+	},
 	footer: {
 		paddingVertical: 16,
 		alignItems: 'center',
+	},
+	skeletonContainer: {
+		flex: 1,
+		paddingVertical: 16,
 	},
 	emptyContainer: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
 		paddingVertical: 48,
+		paddingHorizontal: 24,
+	},
+	errorTitle: {
+		marginBottom: 8,
+		textAlign: 'center',
 	},
 	errorText: {
 		color: '#ff3b30',
 		textAlign: 'center',
+		marginBottom: 24,
+	},
+	emptyTitle: {
+		marginBottom: 8,
+		textAlign: 'center',
+	},
+	emptyText: {
+		textAlign: 'center',
+		opacity: 0.7,
+	},
+	retryButton: {
+		marginTop: 8,
+		paddingHorizontal: 24,
+		paddingVertical: 12,
+		backgroundColor: '#1068FF',
+		borderRadius: 8,
+	},
+	retryButtonText: {
+		color: '#fff',
+		fontWeight: '600',
 	},
 })

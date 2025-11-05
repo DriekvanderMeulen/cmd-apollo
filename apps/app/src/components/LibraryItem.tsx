@@ -4,6 +4,7 @@ import { Link } from 'expo-router'
 
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
+import { useTheme } from '@/src/providers/ThemeProvider'
 import type { LibraryObject } from '@/lib/api'
 import { extractPlainText } from '@/lib/rich-text'
 
@@ -12,10 +13,20 @@ type LibraryItemProps = {
 }
 
 export function LibraryItem({ item }: LibraryItemProps): React.JSX.Element {
+	const { resolvedTheme: theme, isOLED } = useTheme()
+
 	return (
 		<Link href={`/${item.publicId}`} asChild>
 			<Pressable>
-				<ThemedView style={styles.container}>
+				<ThemedView
+					style={[
+						styles.container,
+					{
+						backgroundColor:
+							theme === 'light' ? '#f5f5f5' : isOLED ? '#000000' : '#2a2a2a',
+					},
+					]}
+				>
 					<ThemedView style={styles.content}>
 						<ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={2}>
 							{item.title}
@@ -42,7 +53,6 @@ const styles = StyleSheet.create({
 		marginBottom: 16,
 		borderRadius: 8,
 		overflow: 'hidden',
-		backgroundColor: '#f5f5f5',
 	},
 	content: {
 		padding: 12,

@@ -5,7 +5,7 @@ import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import { IconSymbol } from '@/components/ui/icon-symbol'
 import { Colors } from '@/constants/theme'
-import { useColorScheme } from '@/hooks/use-color-scheme'
+import { useTheme } from '@/src/providers/ThemeProvider'
 
 type DropdownOption<T> = {
 	value: T
@@ -36,7 +36,7 @@ export function TrueDropdown<T>({
 	const [internalIsOpen, setInternalIsOpen] = useState(false)
 	const [triggerHeight, setTriggerHeight] = useState(0)
 	const triggerRef = useRef<View>(null)
-	const theme = useColorScheme() ?? 'light'
+	const { resolvedTheme: theme, isOLED } = useTheme()
 
 	const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen
 
@@ -93,7 +93,11 @@ export function TrueDropdown<T>({
 				}}
 				style={[
 					styles.trigger,
-					{ borderColor: theme === 'light' ? '#e0e0e0' : '#333' },
+					{
+						backgroundColor:
+							theme === 'light' ? '#fff' : isOLED ? '#000000' : Colors.dark.background,
+						borderColor: theme === 'light' ? '#e0e0e0' : '#333',
+					},
 					triggerStyle,
 				]}
 				onPress={handlePress}
@@ -140,14 +144,31 @@ export function TrueDropdown<T>({
 						]}
 						onStartShouldSetResponder={() => true}
 					>
-						<ThemedView style={styles.dropdown}>
+						<ThemedView
+							style={[
+								styles.dropdown,
+							{
+								backgroundColor:
+									theme === 'light' ? '#fff' : isOLED ? '#000000' : Colors.dark.background,
+								borderColor: theme === 'light' ? '#e0e0e0' : '#333',
+							},
+							]}
+						>
 							<ScrollView style={styles.optionsList} showsVerticalScrollIndicator={false}>
 								{options.map((option) => {
 									const isSelected = value === option.value
 									return (
 										<TouchableOpacity
 											key={String(option.value)}
-											style={[styles.option, isSelected ? styles.optionSelected : undefined]}
+											style={[
+												styles.option,
+												isSelected
+													? {
+															backgroundColor:
+																theme === 'light' ? '#f0f8fa' : '#2a2a2a',
+														}
+													: undefined,
+											]}
 											onPress={() => handleSelect(option.value)}
 											accessibilityRole="button"
 											accessibilityState={{ selected: isSelected }}
@@ -169,7 +190,14 @@ export function TrueDropdown<T>({
 														color={theme === 'light' ? '#0a7ea4' : '#0a7ea4'}
 													/>
 												) : (
-													<View style={styles.checkboxEmpty} />
+													<View
+														style={[
+															styles.checkboxEmpty,
+															{
+																borderColor: theme === 'light' ? '#ddd' : '#555',
+															},
+														]}
+													/>
 												)}
 											</View>
 										</TouchableOpacity>
@@ -226,10 +254,8 @@ const styles = StyleSheet.create({
 		zIndex: 1001,
 	},
 	dropdown: {
-		backgroundColor: '#fff',
 		borderRadius: 8,
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.2,
@@ -250,7 +276,7 @@ const styles = StyleSheet.create({
 		minHeight: 44,
 	},
 	optionSelected: {
-		backgroundColor: '#f0f8fa',
+		// Dynamic backgroundColor based on theme
 	},
 	optionText: {
 		flex: 1,
@@ -272,7 +298,7 @@ const styles = StyleSheet.create({
 		height: 20,
 		borderRadius: 4,
 		borderWidth: 2,
-		borderColor: '#ddd',
+		// Dynamic borderColor based on theme
 	},
 })
 
