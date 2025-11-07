@@ -11,7 +11,7 @@ export default function TabLayout() {
 
 	return (
 		<Tabs
-			initialRouteName="library"
+			initialRouteName="scan"
 			screenOptions={{
 				tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
 				headerShown: false,
@@ -23,20 +23,20 @@ export default function TabLayout() {
 			}}
 		>
 			<Tabs.Screen
-				name="scan"
-				options={{
-					title: 'Scan',
-					tabBarIcon: ({ color, size, focused }) => (
-						<Ionicons name={focused ? 'scan' : 'scan-outline'} color={color} size={size} />
-					),
-				}}
-			/>
-			<Tabs.Screen
 				name="library"
 				options={{
 					title: 'Library',
 					tabBarIcon: ({ color, size, focused }) => (
 						<Ionicons name={focused ? 'library' : 'library-outline'} color={color} size={size} />
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name="scan"
+				options={{
+					title: 'Scan',
+					tabBarIcon: ({ color, size, focused }) => (
+						<Ionicons name={focused ? 'scan' : 'scan-outline'} color={color} size={size} />
 					),
 				}}
 			/>

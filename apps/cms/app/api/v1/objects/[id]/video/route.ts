@@ -11,8 +11,8 @@ import { R2_BUCKET_NAME, createR2Client } from "@/server/clients/r2";
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
 
-function buildVideoKey(collectionId: number, userId: number): string {
-  return `${collectionId}/${userId}/video`;
+function buildVideoKey(collectionId: number, objectId: number): string {
+  return `${collectionId}/${objectId}/video`;
 }
 
 export async function POST(
@@ -67,7 +67,7 @@ export async function POST(
   const arrayBuffer = await file.arrayBuffer();
 
   try {
-    const key = buildVideoKey(obj.collectionId, obj.userId);
+    const key = buildVideoKey(obj.collectionId, obj.id);
 
     // Upload to R2
     await client.send(
