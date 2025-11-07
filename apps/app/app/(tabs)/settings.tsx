@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Linking, Pressable, StyleSheet, Switch, View, Platform } from 'react-native'
 import Constants from 'expo-constants'
 import { ThemedText } from '@/components/themed-text'
@@ -6,6 +6,7 @@ import { useTheme } from '@/src/providers/ThemeProvider'
 import { useColorScheme } from '@/hooks/use-color-scheme'
 import { Colors } from '@/constants/theme'
 import { ScreenContainer } from '@/src/components/ScreenContainer'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function SettingsScreen(): React.JSX.Element {
 	const version = Constants.expoConfig?.version ?? '1.0.0'
@@ -18,6 +19,10 @@ export default function SettingsScreen(): React.JSX.Element {
 	const { themePreference, setThemePreference, oledMode, setOLEDMode } = useTheme()
 	const colorScheme = useColorScheme()
 	const isDark = colorScheme === 'dark'
+	const buttonBg = isDark ? '#2a2a2a' : Colors[colorScheme].tint
+	const buttonText = isDark ? Colors.dark.text : '#fff'
+	const queryClient = useQueryClient()
+	const [refetching, setRefetching] = useState(false)
 
 	function handleOpen(url: string): void {
 		Linking.openURL(url).catch(() => {
@@ -27,6 +32,15 @@ export default function SettingsScreen(): React.JSX.Element {
 
 	function handleThemeSelect(preference: 'light' | 'dark' | 'system') {
 		setThemePreference(preference)
+	}
+
+	async function handleRefetchAll(): Promise<void> {
+		setRefetching(true)
+		try {
+			await queryClient.refetchQueries({ type: 'active' })
+		} finally {
+			setRefetching(false)
+		}
 	}
 
 	return (
@@ -129,6 +143,26 @@ export default function SettingsScreen(): React.JSX.Element {
 
 			<View style={styles.section}>
 				<ThemedText style={styles.sectionTitle} type="defaultSemiBold">
+					Utilities
+				</ThemedText>
+				<Pressable
+					accessibilityRole="button"
+					style={[
+						styles.actionButton,
+						{ backgroundColor: buttonBg, borderColor: isDark ? '#333' : 'transparent', borderWidth: isDark ? 1 : 0 },
+						refetching ? styles.actionButtonDisabled : undefined,
+					]}
+					onPress={handleRefetchAll}
+					disabled={refetching}
+				>
+					<ThemedText style={[styles.actionButtonText, { color: buttonText }]}>
+						{refetching ? 'Refreshing…' : 'Refetch data'}
+					</ThemedText>
+				</Pressable>
+			</View>
+
+			<View style={styles.section}>
+				<ThemedText style={styles.sectionTitle} type="defaultSemiBold">
 					Legal
 				</ThemedText>
 				<Pressable
@@ -219,5 +253,19 @@ const styles = StyleSheet.create({
 	linkText: {
 		fontSize: 16,
 		textDecorationLine: 'underline',
+	},
+	actionButton: {
+		paddingVertical: 12,
+		paddingHorizontal: 16,
+		borderRadius: 8,
+		alignItems: 'center',
+	},
+	actionButtonDisabled: {
+		opacity: 0.6,
+	},
+	actionButtonText: {
+		color: '#fff',
+		fontSize: 16,
+		fontWeight: '600',
 	},
 })

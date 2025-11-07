@@ -23,6 +23,7 @@
 		"@tanstack/react-query": "^5.90.6",
 		"@tanstack/react-query-persist-client": "^5.90.8",
 		"expo": "~54.0.22",
+		"expo-video": "~2.0.0",
 		"expo-constants": "^18.0.10",
 		"expo-haptics": "^15.0.7",
 		"expo-image": "^3.0.10",

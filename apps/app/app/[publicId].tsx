@@ -12,10 +12,12 @@ import Animated, {
 	useDerivedValue,
 } from 'react-native-reanimated'
 
+import { useState } from 'react'
 import { useObjectDetail } from '@/src/hooks/use-object-detail'
 import { ThemedView } from '@/components/themed-view'
 import { ThemedText } from '@/components/themed-text'
 import { RichTextRenderer } from '@/src/components/RichTextRenderer'
+import { VideoOnboarding } from '@/src/components/VideoOnboarding'
 import { useTheme } from '@/src/providers/ThemeProvider'
 import { Colors } from '@/constants/theme'
 
@@ -29,6 +31,7 @@ export default function ObjectDetailScreen() {
 		publicId: publicId ?? '',
 		enabled: Boolean(publicId),
 	})
+	const [hasCompletedVideo, setHasCompletedVideo] = useState(false)
 
 	const backgroundColor =
 		resolvedTheme === 'light' ? '#fff' : isOLED ? '#000000' : Colors.dark.background
@@ -207,6 +210,18 @@ export default function ObjectDetailScreen() {
 			pointerEvents: hasNextPage.value ? 'auto' : 'none',
 		}
 	})
+
+	// Show video onboarding first if video exists and hasn't been completed
+	if (objectData.videoUrl && !hasCompletedVideo) {
+		return (
+			<VideoOnboarding
+				videoUri={objectData.videoUrl}
+				posterUri={objectData.posterUrl}
+				onComplete={() => setHasCompletedVideo(true)}
+				onError={() => setHasCompletedVideo(true)} // Allow proceeding on error
+			/>
+		)
+	}
 
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
