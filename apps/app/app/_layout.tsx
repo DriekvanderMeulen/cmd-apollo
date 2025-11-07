@@ -33,6 +33,7 @@ function RootLayoutContent() {
 						name="[publicId]" 
 						getId={({ params }) => `object-${(params as any)?.publicId}`}
 					/>
+					<Stack.Screen name="open" />
 					<Stack.Screen name="modal" options={{ presentation: 'modal' }} />
 				</Stack>
 				<StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />

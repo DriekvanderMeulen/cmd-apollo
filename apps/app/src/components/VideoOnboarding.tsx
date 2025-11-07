@@ -7,6 +7,105 @@ import { useTheme } from '@/src/providers/ThemeProvider'
 import { Colors } from '@/constants/theme'
 import { ThemedText } from '@/components/themed-text'
 
+// Web video component
+function WebVideoPlayer({
+	videoUri,
+	posterUri,
+	onComplete,
+}: {
+	videoUri: string
+	posterUri?: string | null
+	onComplete: () => void
+}) {
+	const videoRef = useRef<HTMLVideoElement>(null)
+	const [isLoading, setIsLoading] = useState(true)
+	const [hasError, setHasError] = useState(false)
+
+	useEffect(() => {
+		const video = videoRef.current
+		if (!video) return
+
+		const handleCanPlay = () => {
+			setIsLoading(false)
+			video.play().catch((err) => {
+				console.error('Video play error:', err)
+				setHasError(true)
+			})
+		}
+
+		const handleEnded = () => {
+			onComplete()
+		}
+
+		const handleError = () => {
+			console.error('Video error:', video.error)
+			setHasError(true)
+			setIsLoading(false)
+		}
+
+		video.addEventListener('canplay', handleCanPlay)
+		video.addEventListener('ended', handleEnded)
+		video.addEventListener('error', handleError)
+
+		return () => {
+			video.removeEventListener('canplay', handleCanPlay)
+			video.removeEventListener('ended', handleEnded)
+			video.removeEventListener('error', handleError)
+		}
+	}, [onComplete])
+
+	if (hasError) {
+		return (
+			<View style={styles.container}>
+				<ThemedText style={styles.errorText}>Video playback failed</ThemedText>
+				<ThemedText style={styles.errorSubtext}>
+					You can watch the video in your browser or skip to continue
+				</ThemedText>
+				<View style={styles.buttonContainer}>
+					<ThemedText
+						onPress={() => {
+							window.open(videoUri, '_blank')
+							onComplete()
+						}}
+						style={styles.linkButton}
+					>
+						Watch in browser
+					</ThemedText>
+					<ThemedText onPress={onComplete} style={styles.linkButton}>
+						Skip
+					</ThemedText>
+				</View>
+			</View>
+		)
+	}
+
+	return (
+		<View style={styles.container}>
+			{/* @ts-expect-error - web video element */}
+			<video
+				ref={videoRef}
+				src={videoUri}
+				poster={posterUri || undefined}
+				style={{
+					width: '100%',
+					height: '100%',
+					objectFit: 'contain',
+				}}
+				controls={false}
+				playsInline
+				autoPlay
+				muted={false}
+			/>
+			{isLoading ? (
+				<View style={styles.loadingOverlay}>
+					<ActivityIndicator size="large" />
+					<ThemedText style={styles.loadingText}>Loading video...</ThemedText>
+				</View>
+			) : null}
+		</View>
+	)
+}
+
 type VideoOnboardingProps = {
 	videoUri: string
 	posterUri?: string | null
@@ -86,6 +185,17 @@ export function VideoOnboarding({
 			console.error('Error opening URL:', error)
 			Alert.alert('Error', 'Failed to open video')
 		}
+	}
+
+	// Use web video player for web platform
+	if (Platform.OS === 'web') {
+		return (
+			<WebVideoPlayer
+				videoUri={videoUri}
+				posterUri={posterUri}
+				onComplete={onComplete}
+			/>
+		)
 	}
 
 	if (hasError) {

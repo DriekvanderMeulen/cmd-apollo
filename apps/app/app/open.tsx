@@ -1,24 +1,38 @@
 import { StyleSheet, ActivityIndicator } from 'react-native'
-import { useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useQuery } from '@tanstack/react-query'
 
-import { useObjectDetail } from '@/src/hooks/use-object-detail'
+import { fetchObjectByToken } from '@/lib/api'
 import { ThemedView } from '@/components/themed-view'
 import { ThemedText } from '@/components/themed-text'
 import { ObjectViewer } from '@/src/components/ObjectViewer'
 import { useTheme } from '@/src/providers/ThemeProvider'
 import { Colors } from '@/constants/theme'
 
-export default function ObjectDetailScreen() {
-	const { publicId } = useLocalSearchParams<{ publicId: string }>()
+export default function OpenScreen() {
+	const { token } = useLocalSearchParams<{ token: string }>()
+	const router = useRouter()
 	const { resolvedTheme, isOLED } = useTheme()
-	const { data, isLoading, isError, error } = useObjectDetail({
-		publicId: publicId ?? '',
-		enabled: Boolean(publicId),
+
+	const { data, isLoading, isError, error } = useQuery({
+		queryKey: ['object-by-token', token],
+		queryFn: () => fetchObjectByToken(token ?? ''),
+		enabled: Boolean(token),
 	})
 
 	const backgroundColor =
 		resolvedTheme === 'light' ? '#fff' : isOLED ? '#000000' : Colors.dark.background
+
+	if (!token) {
+		return (
+			<SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={['top', 'left', 'right', 'bottom']}>
+				<ThemedView style={styles.container}>
+					<ThemedText style={styles.errorText}>Missing token</ThemedText>
+				</ThemedView>
+			</SafeAreaView>
+		)
+	}
 
 	if (isLoading) {
 		return (
@@ -43,7 +57,7 @@ export default function ObjectDetailScreen() {
 		)
 	}
 
-	if (!data?.data) {
+	if (!data) {
 		return (
 			<SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={['top', 'left', 'right', 'bottom']}>
 				<ThemedView style={styles.container}>
@@ -53,7 +67,7 @@ export default function ObjectDetailScreen() {
 		)
 	}
 
-	return <ObjectViewer objectData={data.data} />
+	return <ObjectViewer objectData={data} />
 }
 
 const styles = StyleSheet.create({
@@ -75,3 +89,4 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 })
+

@@ -268,3 +268,31 @@ export async function fetchLibraryObjects(
 		throw error
 	}
 }
+
+export async function fetchObjectByToken(token: string): Promise<ObjectDetailResponse> {
+	const url = `${CMS_API_URL}/api/v1/app/objects/token?token=${encodeURIComponent(token)}`
+
+	const response = await fetch(url, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${BEARER_TOKEN}`,
+			'Content-Type': 'application/json',
+		},
+	})
+
+	if (!response.ok) {
+		if (response.status === 401) {
+			throw new Error('Invalid or expired token')
+		}
+		if (response.status === 404) {
+			throw new Error('Object not found')
+		}
+		if (response.status === 429) {
+			throw new Error('Rate limit exceeded. Please try again later.')
+		}
+		throw new Error(`Failed to fetch object data: ${response.statusText}`)
+	}
+
+	const data = (await response.json()) as ObjectDetailResponse
+	return data
+}

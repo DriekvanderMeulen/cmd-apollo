@@ -18,6 +18,8 @@ const EnvSchema = z.object({
     .string()
     .startsWith("postgresql://postgres:")
     .endsWith(".proxy.rlwy.net:34523/railway"),
+  QR_TOKEN_SECRET: z.string().min(1, "QR_TOKEN_SECRET is required"),
+  APP_PUBLIC_URL: z.string().url("APP_PUBLIC_URL must be a valid URL"),
 });
 
 let cachedEnv: z.infer<typeof EnvSchema> | null = null;
@@ -42,6 +44,8 @@ function getEnv() {
       GOOGLE_CLIENT_ID: "placeholder.apps.googleusercontent.com",
       GOOGLE_CLIENT_SECRET: "",
       DATABASE_URL: "postgresql://postgres:placeholder@placeholder.proxy.rlwy.net:34523/railway",
+      QR_TOKEN_SECRET: "",
+      APP_PUBLIC_URL: "https://app.apolloview.app",
     } as z.infer<typeof EnvSchema>;
   }
 

@@ -16,7 +16,7 @@
 		"ios": {
 			"supportsTablet": true,
 			"bundleIdentifier": "com.apolloview.app",
-			"associatedDomains": ["applinks:cms.apolloview.app"]
+			"associatedDomains": ["applinks:cms.apolloview.app", "applinks:app.apolloview.app"]
 		},
 		"android": {
 			"adaptiveIcon": {
@@ -24,7 +24,21 @@
 				"backgroundColor": "#ffffff"
 			},
 			"edgeToEdgeEnabled": true,
-			"predictiveBackGestureEnabled": false
+			"predictiveBackGestureEnabled": false,
+			"intentFilters": [
+				{
+					"action": "VIEW",
+					"autoVerify": true,
+					"data": [
+						{
+							"scheme": "https",
+							"host": "app.apolloview.app",
+							"pathPrefix": "/open"
+						}
+					],
+					"category": ["BROWSABLE", "DEFAULT"]
+				}
+			]
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"

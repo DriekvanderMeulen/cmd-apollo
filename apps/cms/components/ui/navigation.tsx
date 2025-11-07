@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LogOut, Users, UserRoundCog } from "lucide-react";
+import { Home, LogOut, Users, UserRoundCog, QrCode } from "lucide-react";
 
 import { logout } from "@/server/auth/actions";
 import { cn } from "@/utils";
@@ -75,12 +75,20 @@ function Navigation({ user }: NavigationProps) {
             />
           )}
           {(user.role === "ADMIN" || user.role === "EDITOR") && (
-            <NavigationItem
-              href="/editor"
-              active={pathname === "/editor"}
-              label="Editor"
-              icon={<Users size={18} />}
-            />
+            <>
+              <NavigationItem
+                href="/editor"
+                active={pathname === "/editor"}
+                label="Editor"
+                icon={<Users size={18} />}
+              />
+              <NavigationItem
+                href="/editor/qr-gen"
+                active={pathname === "/editor/qr-gen"}
+                label="QR gen"
+                icon={<QrCode size={18} />}
+              />
+            </>
           )}
         </ul>
       </div>
