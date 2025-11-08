@@ -1,51 +1,70 @@
 {
-	"expo": {
-		"name": "app",
-		"slug": "app",
-		"version": "1.0.0",
-		"orientation": "portrait",
-		"icon": "./assets/icon.png",
-		"userInterfaceStyle": "automatic",
-		"newArchEnabled": true,
-		"scheme": "apolloview",
-		"splash": {
-			"image": "./assets/splash-icon.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
-		},
-		"ios": {
-			"supportsTablet": true,
-			"bundleIdentifier": "com.apolloview.app",
-			"associatedDomains": ["applinks:cms.apolloview.app", "applinks:app.apolloview.app"],
-			"infoPlist": {
-				"NSCameraUsageDescription": "This app needs access to your camera to scan QR codes."
-			}
-		},
-		"android": {
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/adaptive-icon.png",
-				"backgroundColor": "#ffffff"
-			},
-			"edgeToEdgeEnabled": true,
-			"predictiveBackGestureEnabled": false,
-			"permissions": ["CAMERA"],
-			"intentFilters": [
-				{
-					"action": "VIEW",
-					"autoVerify": true,
-					"data": [
-						{
-							"scheme": "https",
-							"host": "app.apolloview.app",
-							"pathPrefix": "/open"
-						}
-					],
-					"category": ["BROWSABLE", "DEFAULT"]
-				}
-			]
-		},
-		"web": {
-			"favicon": "./assets/favicon.png"
-		}
-	}
+  "expo": {
+    "name": "app",
+    "slug": "app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "scheme": "apolloview",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.apolloview.app",
+      "associatedDomains": [
+        "applinks:cms.apolloview.app",
+        "applinks:app.apolloview.app",
+        "applinks:cms.apolloview.app",
+        "applinks:app.apolloview.app"
+      ],
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs access to your camera to scan QR codes.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.apolloview.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "CAMERA"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "app.apolloview.app",
+              "pathPrefix": "/open"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "cmsUrl": "https://cms.apolloview.app",
+      "cmsReadToken": "",
+      "eas": {
+        "projectId": "b045d1d5-8795-45f7-8900-a70219202618"
+      }
+    }
+  }
 }
