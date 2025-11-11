@@ -42,7 +42,7 @@ export default function ScanScreen(): React.JSX.Element {
 							Step 2: Position the QR Code
 						</ThemedText>
 						<ThemedText style={styles.instructionText}>
-							Hold your device steady and position the QR code within the scanning frame. Make sure the QR
+							Hold your device steady and position the Apollo View QR code within the scanning frame. Make sure the QR
 							code is well-lit and in focus.
 						</ThemedText>
 					</View>
@@ -89,7 +89,7 @@ export default function ScanScreen(): React.JSX.Element {
 					onPress={() => setShowInstructions(true)}
 					style={[styles.helpButton, { backgroundColor: Colors[resolvedTheme ?? 'light'].tint }]}
 				>
-					<Ionicons name="help-circle-outline" size={20} color="#fff" />
+					<Ionicons name="help-circle-outline" size={20} color="#000000" />
 					<ThemedText style={styles.helpButtonText}>How to Scan</ThemedText>
 				</TouchableOpacity>
 			</SafeAreaView>
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
 		gap: 8,
 	},
 	helpButtonText: {
-		color: '#fff',
+		color: '#000000',
 		fontSize: 16,
 		fontWeight: '600',
 	},

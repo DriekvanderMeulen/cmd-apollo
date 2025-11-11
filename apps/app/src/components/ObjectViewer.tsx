@@ -18,6 +18,7 @@ import { RichTextRenderer } from '@/src/components/RichTextRenderer'
 import { VideoOnboarding } from '@/src/components/VideoOnboarding'
 import { useTheme } from '@/src/providers/ThemeProvider'
 import { Colors } from '@/constants/theme'
+import { useThemeColor } from '@/hooks/use-theme-color'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -253,20 +254,9 @@ export function ObjectViewer({ objectData, onClose }: ObjectViewerProps) {
 				{firstIteration ? (
 					<Animated.View style={[showIterationsButtonOpacity, { position: 'absolute', bottom: 0, left: 0, right: 0 }]}>
 						<SafeAreaView edges={['bottom']} style={styles.bottomSafeArea}>
-							<Pressable
-								onPress={handleShowIterations}
-								style={[
-									styles.nextButton,
-									{
-										backgroundColor:
-											resolvedTheme === 'light'
-												? Colors.light.tint
-												: '#0a7ea4',
-									},
-								]}
-							>
-								<ThemedText style={styles.nextButtonText}>Show Iterations</ThemedText>
-							</Pressable>
+							<ThemedView lightColor="#81C7B4" darkColor="#EBBED3" style={styles.nextButton}>
+								<ThemedText style={styles.nextButtonText} lightColor="#000000" darkColor="#000000">Show Iterations</ThemedText>
+							</ThemedView>
 						</SafeAreaView>
 					</Animated.View>
 				) : null}
@@ -274,36 +264,14 @@ export function ObjectViewer({ objectData, onClose }: ObjectViewerProps) {
 					<SafeAreaView edges={['bottom']} style={styles.bottomSafeArea}>
 						<View style={styles.navigationButtons}>
 							<Animated.View style={previousButtonOpacity}>
-								<Pressable
-									onPress={() => handleSwipeRight()}
-									style={[
-										styles.navButton,
-										{
-											backgroundColor:
-												resolvedTheme === 'light'
-													? Colors.light.tint
-													: '#0a7ea4',
-										},
-									]}
-								>
-									<Ionicons name="chevron-back" size={24} color="#fff" />
-								</Pressable>
+								<ThemedView lightColor="#81C7B4" darkColor="#EBBED3" style={styles.navButton}>
+									<Ionicons name="chevron-back" size={24} color="#000000" />
+								</ThemedView>
 							</Animated.View>
 							<Animated.View style={nextButtonOpacity}>
-								<Pressable
-									onPress={() => handleSwipeLeft()}
-									style={[
-										styles.navButton,
-										{
-											backgroundColor:
-												resolvedTheme === 'light'
-													? Colors.light.tint
-													: '#0a7ea4',
-										},
-									]}
-								>
-									<Ionicons name="chevron-forward" size={24} color="#fff" />
-								</Pressable>
+								<ThemedView lightColor="#81C7B4" darkColor="#EBBED3" style={styles.navButton}>
+									<Ionicons name="chevron-forward" size={24} color="#000000" />
+								</ThemedView>
 							</Animated.View>
 						</View>
 					</SafeAreaView>
@@ -375,7 +343,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	nextButtonText: {
-		color: '#fff',
 		fontSize: 16,
 		fontWeight: '600',
 	},

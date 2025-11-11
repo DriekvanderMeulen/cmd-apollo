@@ -96,22 +96,29 @@ export function QRScanner(): React.JSX.Element {
 	}
 
 	function handleBarCodeScanned({ data }: { data: string }) {
-		if (scanned) return
+		// Validate URL origin first
+		let urlObj
+		try {
+			urlObj = new URL(data)
+		} catch {
+			// Silently ignore non-URL data
+			return
+		}
 
-		setScanned(true)
-		Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+		if (urlObj.hostname !== 'cms.apolloview.app') {
+			// Silently ignore wrong domain
+			return
+		}
 
 		const token = extractTokenFromUrl(data)
 
 		if (!token) {
-			Alert.alert('Invalid QR Code', 'The scanned QR code does not contain a valid token.', [
-				{
-					text: 'Try Again',
-					onPress: () => setScanned(false),
-				},
-			])
+			// Silently ignore no token
 			return
 		}
+
+		setScanned(true)
+		Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
 
 		router.push(`/open?token=${encodeURIComponent(token)}`)
 	}
@@ -248,7 +255,7 @@ const styles = StyleSheet.create({
 		minWidth: 200,
 	},
 	downloadButtonText: {
-		color: '#fff',
+		color: '#000000',
 		fontSize: 16,
 		fontWeight: '600',
 		textAlign: 'center',

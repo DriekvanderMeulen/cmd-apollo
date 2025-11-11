@@ -28,7 +28,7 @@
       }
     },
     "android": {
-      "package": "com.apolloview.app",
+      "package": "com.driekdev.apolloexpo",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

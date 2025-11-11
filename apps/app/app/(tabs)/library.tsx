@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { FlatList, StyleSheet, ActivityIndicator, View, RefreshControl, Pressable } from 'react-native'
+import { FlatList, StyleSheet, ActivityIndicator, View, RefreshControl, Pressable, Text } from 'react-native'
+import { Svg, Path } from 'react-native-svg'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 
 import { ScreenContainer } from '@/src/components/ScreenContainer'
@@ -18,8 +19,11 @@ import {
 } from '@/lib/api'
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
+import { useThemeColor } from '@/hooks/use-theme-color'
 
 const PAGE_SIZE = 20
+
+const scribbleSvg = `M.37,29.99C.25,48.08.12,66.18,0,84.28c-.1,13.94,17.97,17.59,25.13,6.81,11.86-17.86,23.79-35.64,39.89-50.01l-22.54-13.12c-6.74,28-13.48,56-20.22,83.99-1.56,6.49,1.5,13.37,7.81,15.91,5.93,2.39,13.69.54,16.84-5.52,17.29-33.28,34.57-67.26,57.79-96.9-7.51-4.37-15.03-8.75-22.54-13.12-6.39,19.55-11.94,39.37-16.56,59.41-2.28,9.89-4.34,19.83-6.18,29.81s-6.46,23.29.05,32.01c2.94,3.93,6.47,6.68,11.64,6.68,4.32,0,9.81-2.47,11.64-6.68,14.54-33.29,31.36-65.52,50.39-96.45-8.22-3.46-16.43-6.93-24.65-10.39-6.12,31.29-12.08,62.62-15.42,94.35-.61,5.79,4.62,11.55,9.9,13,5.74,1.58,12.23-1.04,15.23-6.2,21.49-36.89,44.59-72.83,69.25-107.69-8.22-3.46-16.43-6.93-24.65-10.39-12.02,37.89-25.75,75.22-41.17,111.86-5.16,12.26,14.34,23.31,22.54,13.12,25.18-31.31,51.63-61.57,79.32-90.68-7.51-4.37-15.03-8.75-22.54-13.12-10.92,33.9-28.79,64.92-41.1,98.61-2.28,6.23,2.04,13.59,7.81,15.91,6.38,2.57,13.09.25,16.84-5.52,15.48-23.8,38.21-41.35,56.87-62.58,4.8-5.47,5.38-13.69,0-19.07-4.9-4.9-14.24-5.49-19.07,0-20.25,23.05-44.2,42.07-61.09,68.04,8.22,3.46,16.43,6.93,24.65,10.39,12.24-33.51,30.14-64.57,41.1-98.61,4.14-12.85-13.41-22.72-22.54-13.12-27.69,29.11-54.14,59.37-79.32,90.68,7.51,4.37,15.03,8.75,22.54,13.12,15.42-36.64,29.15-73.97,41.17-111.86,2.01-6.34-1.84-13.51-7.81-15.91-6.57-2.64-12.85-.12-16.84,5.52-24.66,34.86-47.75,70.79-69.25,107.69l25.13,6.81c3.08-29.32,8.8-58.27,14.45-87.18,2.87-14.66-16.32-23.91-24.65-10.39-19.04,30.93-35.86,63.16-50.39,96.45h23.29c.68.9-.14,5.33.53.96.39-2.51.84-5.01,1.29-7.51.78-4.37,1.59-8.74,2.45-13.1,1.78-9.02,3.74-18,5.88-26.94,4.35-18.16,9.46-36.12,15.25-53.86,1.84-5.63-1.22-12.32-6.2-15.23-4.73-2.77-12.71-2.53-16.34,2.11-24.77,31.61-43.56,66.83-62.01,102.35,8.22,3.46,16.43,6.93,24.65,10.39,6.74-28,13.48-56,20.22-83.99,3.23-13.42-12.53-22.05-22.54-13.12C28.23,37.82,14.89,57.81,1.84,77.47l25.13,6.81c.12-18.1.25-36.19.37-54.29S.49,12.61.37,29.99H.37Z`
 
 function isNetworkError(error: unknown): boolean {
 	if (!(error instanceof Error)) return false
@@ -154,7 +158,7 @@ export default function LibraryScreen(): React.JSX.Element {
 							}
 							return { data: result.data, etag: result.etag }
 						},
-						staleTime: 5 * 60 * 1000, // 5 minutes
+						staleTime: 5 * 60 * 60 * 1000, // 5 minutes
 					})
 				}
 			})
@@ -197,9 +201,9 @@ export default function LibraryScreen(): React.JSX.Element {
 								? error.message
 								: 'Failed to load library items'}
 					</ThemedText>
-					<Pressable onPress={handleRetry} style={styles.retryButton}>
-						<ThemedText style={styles.retryButtonText}>Retry</ThemedText>
-					</Pressable>
+					<ThemedView lightColor="#81C7B4" darkColor="#EBBED3" style={styles.retryButton}>
+						<ThemedText style={styles.retryButtonText} lightColor="#000000" darkColor="#000000">Retry</ThemedText>
+					</ThemedView>
 				</ThemedView>
 			)
 		}
@@ -220,14 +224,22 @@ export default function LibraryScreen(): React.JSX.Element {
 		}
 
 		if (isEmptyList) {
+			const accentColor = useThemeColor({}, 'accent')
 			return (
 				<ThemedView style={styles.emptyContainer}>
-					<ThemedText style={styles.emptyTitle} type="subtitle">
-						No items yet
-					</ThemedText>
-					<ThemedText style={styles.emptyText}>
-						Scan items to add them to your library.
-					</ThemedText>
+					<ThemedView style={[styles.scribbleContainer, { backgroundColor: accentColor }]}>
+						<Svg width="200" height="120" viewBox="0 0 245.21 146.53">
+							<Path d={scribbleSvg} fill={accentColor} />
+						</Svg>
+						<View style={styles.scribbleTextOverlay}>
+							<ThemedText style={styles.emptyTitle} type="subtitle" lightColor="#000000" darkColor="#000000">
+								No items yet
+							</ThemedText>
+							<ThemedText style={styles.emptyText} lightColor="#000000" darkColor="#000000">
+								Scan items to add them to your library.
+							</ThemedText>
+						</View>
+					</ThemedView>
 				</ThemedView>
 			)
 		}
@@ -286,7 +298,15 @@ export default function LibraryScreen(): React.JSX.Element {
 					}
 					showsVerticalScrollIndicator={false}
 					refreshControl={
-						<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+						<RefreshControl 
+							refreshing={refreshing} 
+							onRefresh={handleRefresh}
+							colors={['#000000']}
+							tintColor="#000000"
+							progressBackgroundColor="#000000"
+							title="Pull to refresh"
+							titleColor="#000000"
+						/>
 					}
 					onViewableItemsChanged={handleViewableItemsChanged}
 					viewabilityConfig={viewabilityConfig}
@@ -311,10 +331,12 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	listContent: {
+		paddingTop: 16,
 		paddingBottom: 16,
 	},
 	listContentEmpty: {
 		flexGrow: 1,
+		paddingTop: 16,
 		paddingBottom: 16,
 	},
 	footer: {
@@ -353,11 +375,28 @@ const styles = StyleSheet.create({
 		marginTop: 8,
 		paddingHorizontal: 24,
 		paddingVertical: 12,
-		backgroundColor: '#1068FF',
 		borderRadius: 8,
 	},
 	retryButtonText: {
-		color: '#fff',
 		fontWeight: '600',
+	},
+	scribbleContainer: {
+		position: 'relative',
+		width: 200,
+		height: 120,
+		borderRadius: 8,
+		overflow: 'hidden',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	scribbleTextOverlay: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+		padding: 16,
 	},
 })

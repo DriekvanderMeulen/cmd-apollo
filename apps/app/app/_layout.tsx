@@ -5,6 +5,7 @@ import 'react-native-reanimated'
 import { QueryProvider } from '@/src/providers/QueryProvider'
 import { ThemeProvider } from '@/src/providers/ThemeProvider'
 import { LibraryPrefetcher } from '@/src/components/LibraryPrefetcher'
+import { useFonts } from 'expo-font'
 
 import { useColorScheme } from '@/hooks/use-color-scheme'
 
@@ -22,6 +23,14 @@ export default function RootLayout() {
 
 function RootLayoutContent() {
 	const colorScheme = useColorScheme()
+
+	const [fontsLoaded] = useFonts({
+		'SFProText-Regular': require('../assets/fonts/SF-Pro-Text-Regular.otf'),
+	})
+
+	if (!fontsLoaded) {
+		return null
+	}
 
 	return (
 		<QueryProvider>
