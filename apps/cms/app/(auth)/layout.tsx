@@ -2,14 +2,14 @@ import Link from "next/link";
 
 function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-full flex-row">
-      <div className="flex h-full w-1/2 px-16 bg-red-100 flex-col items-center justify-between ">
-        <div className="flex h-16 w-full items-center px-6 gap-2 text-lg font-semibold text-neutral-900">
-          <p>ApolloView</p>
-          <strong>CMS</strong>
+    <div className="flex h-screen w-full flex-row overflow-hidden bg-white">
+      <div className="flex h-full w-full lg:w-1/2 px-2 flex-col items-center justify-between relative z-10">
+        <div className="flex h-24 w-full items-center gap-2 text-xl font-bold text-neutral-900">
+          <div className="h-8 w-8 bg-neutral-900 rounded-lg" />
+          <span>ApolloView CMS</span>
         </div>
-        <div className="p-8 self-start">{children}</div>
-        <div className="flex h-16 w-full items-left justify-start flex-col px-6 text-sm text-neutral-500">
+        <div className="w-full max-w-[440px]">{children}</div>
+        <div className="flex h-24 w-full flex-col justify-center gap-1 text-xs text-neutral-500 font-medium">
           <Link
             href="/privacy-terms-conditions-cookies"
             className="hover:text-neutral-700 transition-colors"
@@ -28,12 +28,16 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
       </div>
-      <div className="flex w-1/2 bg-red-950">
-        <span className="text-5xl text-white self-center font-black">
-          TODO IMAGE FIXEN!!!!
-        </span>
+      <div
+        className="hidden lg:flex w-1/2 relative bg-neutral-100"
+      >
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/bg-image.jpg')" }} 
+        />
+        <div className="absolute inset-0 bg-neutral-900/10" />
       </div>
-    </div>
+    </div>  
   );
 }
 

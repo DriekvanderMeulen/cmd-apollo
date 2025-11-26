@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { HiMiniMagnifyingGlass } from "react-icons/hi2";
+import { Search } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-import { Button, Spinner } from "@/components/ui";
+import { Button, ButtonLink, Input, Select } from "@/components/ui";
 
 type ObjectRow = {
   id: number;
@@ -81,52 +80,66 @@ export function ObjectsTable() {
             setParam("page", "1");
           }}
           className="relative"
+          role="search"
         >
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
-            <HiMiniMagnifyingGlass size={18} />
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 z-10">
+            <Search size={18} aria-hidden="true" />
           </div>
-          <input
+          <Input
             type="search"
             defaultValue={q}
             onChange={(e) => setParam("q", e.target.value)}
-            className="h-9 w-80 rounded-md pl-9 pr-3 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none placeholder:text-neutral-400 transition-colors"
+            className="w-80 pl-9"
             placeholder="Search objects..."
+            aria-label="Search objects"
           />
         </form>
         <div className="flex items-center gap-2">
-          <label className="text-sm text-neutral-600 font-medium">Sort</label>
-          <select
+          <label
+            htmlFor="objects-sort"
+            className="text-sm text-neutral-600 font-medium"
+          >
+            Sort
+          </label>
+          <Select
+            id="objects-sort"
             value={sort}
             onChange={(e) => setParam("sort", e.target.value)}
-            className="h-9 rounded-md border border-neutral-200 px-3 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors"
           >
             <option value="title:asc">Title ↑</option>
             <option value="title:desc">Title ↓</option>
-          </select>
-        
-          <Link
-            href="/new-object"
-            className="inline-flex border-1 border-black items-center rounded-md bg-neutral-800 px-3.5 py-2 text-sm font-medium text-black hover:bg-neutral-900 transition-colors shadow-sm"
-          >
-            New object
-          </Link>
+          </Select>
+
+          <ButtonLink href="/new-object" title="New object" />
         </div>
       </div>
 
       <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
-        <table className="min-w-full">
+        <table className="min-w-full" aria-label="Objects list">
           <thead className="bg-neutral-50/60 border-b border-neutral-200">
             <tr>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-neutral-600">
+              <th
+                scope="col"
+                className="px-5 py-3 text-left text-xs font-semibold text-neutral-600"
+              >
                 Title
               </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-neutral-600">
+              <th
+                scope="col"
+                className="px-5 py-3 text-left text-xs font-semibold text-neutral-600"
+              >
                 Collection
               </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-neutral-600">
+              <th
+                scope="col"
+                className="px-5 py-3 text-left text-xs font-semibold text-neutral-600"
+              >
                 Category
               </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-neutral-600">
+              <th
+                scope="col"
+                className="px-5 py-3 text-left text-xs font-semibold text-neutral-600"
+              >
                 Actions
               </th>
             </tr>
@@ -157,12 +170,13 @@ export function ObjectsTable() {
                     {item.categoryTitle || "—"}
                   </td>
                   <td className="px-5 py-3.5">
-                    <Link
+                    <ButtonLink
                       href={`/${item.publicId}`}
-                      className="text-sm text-neutral-600 hover:text-neutral-900 font-medium transition-colors"
-                    >
-                      Edit
-                    </Link>
+                      title="Edit"
+                      aria-label={`Edit ${item.title}`}
+                      variant="secondary"
+                      size="sm"
+                    />
                   </td>
                 </tr>
               ))
@@ -172,29 +186,33 @@ export function ObjectsTable() {
       </div>
 
       <div className="flex items-center justify-between text-sm text-neutral-600">
-        <span>
+        <span aria-live="polite">
           Showing {items.length} of {total}
         </span>
         <div className="flex items-center gap-2">
-          <button
-            className="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-neutral-100 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setParam("page", String(Math.max(1, page - 1)))}
             disabled={page <= 1}
+            aria-label="Go to previous page"
           >
             Prev
-          </button>
-          <span className="text-sm">
+          </Button>
+          <span className="text-sm" aria-current="page">
             Page {page} of {totalPages}
           </span>
-          <button
-            className="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-neutral-100 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() =>
               setParam("page", String(Math.min(totalPages, page + 1)))
             }
             disabled={page >= totalPages}
+            aria-label="Go to next page"
           >
             Next
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
-import { Button, Spinner } from "@/components/ui";
+import { Button, Spinner, Input, Select, Label } from "@/components/ui";
 import { VideoUpload } from "./video-upload";
 import { TiptapEditor } from "./tiptap-editor";
 
@@ -117,19 +117,18 @@ export function NewObjectForm() {
   return (
     <div className="space-y-5">
       <div>
-        <label className="block mb-1.5 text-sm font-medium text-neutral-700">
+        <Label className="block mb-1.5">
           Title
-        </label>
-        <input
+        </Label>
+        <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="h-9 w-full rounded-md px-3 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors"
         />
       </div>
       <div>
-        <label className="block mb-1.5 text-sm font-medium text-neutral-700">
+        <Label className="block mb-1.5">
           Description
-        </label>
+        </Label>
         <TiptapEditor
           value={description}
           onChange={(value) => setDescription(value)}
@@ -138,13 +137,12 @@ export function NewObjectForm() {
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block mb-1.5 text-sm font-medium text-neutral-700">
+          <Label className="block mb-1.5">
             Collection
-          </label>
-          <select
+          </Label>
+          <Select
             value={collectionId}
             onChange={(e) => setCollectionId(e.target.value)}
-            className="h-9 w-full rounded-md px-3 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors"
           >
             <option value="">Select a collection…</option>
             {collections.map((c) => (
@@ -152,16 +150,15 @@ export function NewObjectForm() {
                 {c.title}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
         <div>
-          <label className="block mb-1.5 text-sm font-medium text-neutral-700">
+          <Label className="block mb-1.5">
             Category (optional)
-          </label>
-          <select
+          </Label>
+          <Select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="h-9 w-full rounded-md px-3 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors"
           >
             <option value="">No category</option>
             {categories.map((c) => (
@@ -169,7 +166,7 @@ export function NewObjectForm() {
                 {c.title}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
       <div className="flex items-center gap-3">
@@ -180,9 +177,9 @@ export function NewObjectForm() {
           onChange={(e) => setIsPublic(e.target.checked)}
           className="w-4 h-4 rounded border-neutral-300 text-accent focus:ring-accent/20"
         />
-        <label htmlFor="public" className="text-sm text-neutral-700">
+        <Label htmlFor="public">
           Make public (visible in app library)
-        </label>
+        </Label>
       </div>
       <div>
         <VideoUpload onUpload={handleVideoUpload} className="max-w-md" />

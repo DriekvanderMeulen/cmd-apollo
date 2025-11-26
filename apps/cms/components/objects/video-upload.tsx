@@ -207,7 +207,7 @@ export function VideoUpload({
               <div className="mt-3">
                 <video
                   controls
-                  className="w-full max-w-md rounded-md border border-neutral-200"
+                  className="w-48 aspect-[9/16] rounded-md border border-neutral-200 object-cover bg-black"
                   src={existingVideoUrl}
                 >
                   Your browser does not support the video tag.

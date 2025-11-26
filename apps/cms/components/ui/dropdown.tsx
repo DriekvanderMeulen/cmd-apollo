@@ -23,12 +23,12 @@ function Dropdown({ trigger, items, align }: DropdownProps) {
       <RadixDropdown.Portal>
         <RadixDropdown.Content
           align={align}
-          className="relative z-20 w-48 rounded-lg border border-neutral-200 bg-white p-1 shadow-lg"
+          className="relative z-50 w-48 rounded-lg border border-neutral-200 bg-white p-1 shadow-lg data-[side=bottom]:animate-slide-up-fade data-[side=top]:animate-slide-down-fade"
         >
           {items.map((item, i) => (
             <RadixDropdown.DropdownMenuItem
               className={cn(
-                "cursor-pointer rounded-md px-3 py-2 text-sm font-medium focus:outline-none transition-colors",
+                "cursor-pointer rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors",
                 item.isDanger
                   ? "text-red-600 focus:bg-red-50"
                   : "text-neutral-700 focus:bg-neutral-100",

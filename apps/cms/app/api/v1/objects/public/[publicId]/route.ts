@@ -125,9 +125,14 @@ export async function GET(
 
 	// Build response
 	const response = {
+		id: objRow.id,
 		publicId: objRow.publicId,
 		title: objRow.title,
 		description: objRow.description,
+		collectionId: objRow.collectionId,
+		categoryId: objRow.categoryId,
+		cfR2Link: objRow.cfR2Link,
+		videoR2Key: objRow.videoR2Key,
 		user: {
 			id: objRow.userId,
 			publicId: objRow.userPublicId,

@@ -3,6 +3,7 @@
 import type { PropsWithChildren } from "react";
 
 import { cn } from "@/utils";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
 
 interface SettingsBlock extends PropsWithChildren {
   title: string;
@@ -17,11 +18,13 @@ function SettingsBlock({
   direction = "column",
 }: SettingsBlock) {
   return (
-    <div className="grid grid-cols-2 gap-x-8 rounded-2xl bg-white p-6">
-      <h3 className="col-span-2 pb-0.5 text-xl font-bold">{title}</h3>
+    <Card className="grid grid-cols-2 gap-x-8 p-0 bg-white overflow-hidden">
+      <div className="col-span-2 p-6 pb-0">
+         <h3 className="text-xl font-bold">{title}</h3>
+      </div>
       <div
         className={cn(
-          "max-w-96 whitespace-pre-line text-sm text-neutral-600",
+          "max-w-96 whitespace-pre-line text-sm text-neutral-600 px-6 pt-2 pb-6",
           direction === "column" ? "col-span-1" : "col-span-2",
         )}
       >
@@ -29,12 +32,13 @@ function SettingsBlock({
       </div>
       <div
         className={cn(
-          direction === "column" ? "col-span-1" : "col-span-2 pt-4",
+          "px-6 pb-6",
+          direction === "column" ? "col-span-1 pt-2" : "col-span-2 pt-0",
         )}
       >
         {children}
       </div>
-    </div>
+    </Card>
   );
 }
 

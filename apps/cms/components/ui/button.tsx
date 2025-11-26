@@ -18,31 +18,41 @@ interface ButtonProps
 
 interface ButtonLinkProps extends LinkProps, BaseButtonProps {
   title: string;
+  "aria-label"?: string;
 }
 
 const variants = cva(
-  "h-9 rounded-md transition-colors px-4 justify-center space-x-2 inline-flex items-center font-medium text-sm border border-transparent",
+  "rounded-md transition-colors justify-center space-x-2 inline-flex items-center font-medium border border-transparent",
   {
     variants: {
       variant: {
         primary:
-          "text-white bg-neutral-800 hover:bg-neutral-900 active:bg-neutral-950 shadow-sm",
+          "text-white bg-accent hover:bg-accent/90 active:bg-accent/80 shadow-sm",
         secondary:
           "text-neutral-700 bg-white border-neutral-200 hover:bg-neutral-50 shadow-sm",
         "secondary-gray":
           "text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80",
+        ghost:
+          "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900",
         danger:
           "text-white bg-red-600 hover:bg-red-700 active:bg-red-800 shadow-sm",
+      },
+      size: {
+        default: "h-9 px-4 text-sm",
+        sm: "h-8 px-3 text-sm",
+        icon: "h-9 w-9 p-0",
       },
     },
     defaultVariants: {
       variant: "primary",
+      size: "default",
     },
   },
 );
 
 export function Button({
   variant,
+  size,
   title,
   className,
   iconLeft,
@@ -62,7 +72,7 @@ export function Button({
       aria-label={derivedAriaLabel}
       {...props}
       className={cn(
-        variants({ variant }),
+        variants({ variant, size }),
         isLoading && "opacity-60",
         className,
       )}
@@ -78,6 +88,7 @@ export function Button({
 export function ButtonLink({
   title,
   variant,
+  size,
   className,
   iconLeft,
   iconRight,
@@ -87,9 +98,12 @@ export function ButtonLink({
   const content = title ?? children;
   return (
     <Link
+      aria-label={
+        props["aria-label"] ??
+        (typeof content === "string" ? (content as string) : undefined)
+      }
       {...props}
-      aria-label={typeof content === "string" ? (content as string) : undefined}
-      className={cn(variants({ variant }), className)}
+      className={cn(variants({ variant, size }), className)}
     >
       {iconLeft ? iconLeft : null}
       {content ? <span>{content}</span> : null}

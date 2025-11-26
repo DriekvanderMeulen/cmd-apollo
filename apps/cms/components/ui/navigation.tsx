@@ -33,7 +33,7 @@ function NavigationItem({ href, active, label, icon }: NavigationItemProps) {
         className={cn(
           "flex items-center space-x-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors",
           active
-            ? "bg-neutral-200/70 text-neutral-900"
+            ? "bg-accent/10 text-accent"
             : "text-neutral-600 hover:bg-neutral-100/60 hover:text-neutral-800",
         )}
       >

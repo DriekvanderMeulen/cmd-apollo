@@ -3,15 +3,15 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import {
-  HiMiniMagnifyingGlass,
-  HiChevronUpDown,
-  HiChevronUp,
-  HiChevronDown,
-  HiMiniEllipsisHorizontal,
-} from "react-icons/hi2";
+  ChevronsUpDown,
+  ChevronUp,
+  ChevronDown,
+  MoreHorizontal,
+  Search,
+} from "lucide-react";
 import { toast } from "react-hot-toast";
 
-import { Dropdown, Spinner } from "@/components/ui";
+import { Dropdown, Spinner, Button, Input, Select, Badge } from "@/components/ui";
 import {
   updateUserRole,
   deleteUser,
@@ -33,10 +33,10 @@ interface UserRowProps {
   user: UserWithSessionCount;
 }
 
-const roleColors = {
-  ADMIN: "bg-red-100 text-red-800",
-  EDITOR: "bg-yellow-100 text-yellow-800",
-  USER: "bg-gray-100 text-gray-800",
+const roleColors: Record<"ADMIN" | "EDITOR" | "USER", "destructive" | "warning" | "neutral"> = {
+  ADMIN: "destructive",
+  EDITOR: "warning",
+  USER: "neutral",
 };
 
 function UserRow({ user }: UserRowProps) {
@@ -149,14 +149,7 @@ function UserRow({ user }: UserRowProps) {
         </div>
       </td>
       <td className="px-5 py-3.5">
-        <span
-          className={cn(
-            "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium",
-            roleColors[user.role],
-          )}
-        >
-          {user.role}
-        </span>
+        <Badge variant={roleColors[user.role]}>{user.role}</Badge>
       </td>
       <td className="px-5 py-3.5">
         <div className="flex items-center space-x-1.5">
@@ -178,16 +171,13 @@ function UserRow({ user }: UserRowProps) {
         {canModify ? (
           <Dropdown
             trigger={
-              <button
-                className="p-1.5 hover:bg-neutral-100 cursor-pointer rounded-md disabled:opacity-50 transition-colors"
-                disabled={isPending}
-              >
+              <Button variant="ghost" size="icon" disabled={isPending}>
                 {isPending && activeAction ? (
                   <Spinner size={16} />
                 ) : (
-                  <HiMiniEllipsisHorizontal size={18} />
+                  <MoreHorizontal size={18} />
                 )}
-              </button>
+              </Button>
             }
             items={dropdownItems}
             align="end"
@@ -241,11 +231,11 @@ export function UserManagementTable({
 
   const getSortIcon = (column: "name" | "email" | "role") => {
     if (sortBy !== column)
-      return <HiChevronUpDown size={16} className="text-neutral-400" />;
+      return <ChevronsUpDown size={16} className="text-neutral-400" />;
     return sortOrder === "asc" ? (
-      <HiChevronUp size={16} className="text-neutral-700" />
+      <ChevronUp size={16} className="text-neutral-700" />
     ) : (
-      <HiChevronDown size={16} className="text-neutral-700" />
+      <ChevronDown size={16} className="text-neutral-700" />
     );
   };
 
@@ -256,30 +246,29 @@ export function UserManagementTable({
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex items-center justify-between">
-        <form onSubmit={handleSearch} className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
-            <HiMiniMagnifyingGlass size={18} />
+        <form onSubmit={handleSearch} className="relative w-80">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
+            <Search size={18} />
           </div>
-          <input
+          <Input
             type="search"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="h-9 w-80 rounded-md pl-9 pr-3 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none placeholder:text-neutral-400 transition-colors"
+            className="pl-9"
             placeholder="Search users..."
           />
         </form>
 
-        <div className="flex items-center space-x-3">
-          <select
+        <div className="flex items-center space-x-3 w-40">
+          <Select
             value={roleFilter || ""}
             onChange={(e) => updateUrl("role", e.target.value || null)}
-            className="h-9 rounded-md px-3 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors"
           >
             <option value="">All Roles</option>
             <option value="ADMIN">Admin</option>
             <option value="EDITOR">Editor</option>
             <option value="USER">User</option>
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -360,20 +349,22 @@ export function UserManagementTable({
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-2">
-        <button
-          className="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-neutral-100 cursor-pointer disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setPage(Math.max(1, pageNum - 1))}
           disabled={pageNum <= 1}
         >
           Prev
-        </button>
+        </Button>
         <span className="text-sm">Page {pageNum}</span>
-        <button
-          className="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-neutral-100 cursor-pointer disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setPage(pageNum + 1)}
         >
           Next
-        </button>
+        </Button>
       </div>
     </div>
   );

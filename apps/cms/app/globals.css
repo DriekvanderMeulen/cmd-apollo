@@ -40,6 +40,10 @@
   --spacing-22: 5.5rem;
   --spacing-3.5: 0.875rem;
 
+  /* Animations */
+  --animate-slide-up-fade: slideUpFade 0.2s ease-out;
+  --animate-slide-down-fade: slideDownFade 0.2s ease-out;
+
   --line-height-11: 2.75rem;
 
   --border-width-3: 3px;
@@ -48,6 +52,28 @@
   --max-width-8xl: 2200px;
 
   --animate-spin-fast: spin 0.5s linear infinite;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Shadow tokens (Notion-inspired - softer, more subtle) */
@@ -246,15 +272,15 @@ body {
 }
 
 .tiptap h2 {
-  @apply text-xl font-semibold mt-6 mb-3 first:mt-0;
+  @apply text-xl font-bold mt-6 mb-3 first:mt-0 text-neutral-900;
 }
 
 .tiptap h3 {
-  @apply text-lg font-semibold mt-5 mb-2 first:mt-0;
+  @apply text-lg font-bold mt-5 mb-2 first:mt-0 text-neutral-900;
 }
 
 .tiptap h4 {
-  @apply text-base font-semibold mt-4 mb-2 first:mt-0;
+  @apply text-base font-bold mt-4 mb-2 first:mt-0 text-neutral-900;
 }
 
 .tiptap p {
@@ -307,8 +333,4 @@ body {
 
 .tiptap s {
   @apply line-through;
-}
-
-button{
-  color: black;
 }

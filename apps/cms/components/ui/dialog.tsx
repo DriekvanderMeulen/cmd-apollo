@@ -2,7 +2,7 @@
 
 import * as RdxDialog from "@radix-ui/react-dialog";
 import { KeyboardEvent, useCallback, useEffect } from "react";
-import { HiMiniXMark } from "react-icons/hi2";
+import { X } from "lucide-react";
 
 import { Button } from "@/components/ui";
 
@@ -63,7 +63,7 @@ function Dialog({
           onClick={setIsOpen ? () => setIsOpen(false) : undefined}
           className="dialog-overlay fixed inset-0 z-40 bg-neutral-900/40 backdrop-blur-sm"
         />
-        <RdxDialog.Content className="dialog-content no-scrollbar fixed left-1/2 top-1/2 z-50 max-h-[560px] min-w-[640px] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-scroll rounded-xl bg-white shadow-xl border border-neutral-200">
+        <RdxDialog.Content className="dialog-content no-scrollbar fixed left-1/2 top-1/2 z-50 max-h-[560px] min-w-[640px] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-scroll rounded-xl bg-white shadow-xl border border-neutral-200 outline-none">
           <div className="sticky top-0">
             <div className="flex items-start justify-between bg-white px-6 pb-2 pt-6 border-b border-neutral-200">
               <div>
@@ -76,9 +76,9 @@ function Dialog({
               </div>
               <RdxDialog.Close
                 onClick={setIsOpen ? () => setIsOpen(false) : undefined}
-                className="flex h-7 w-7 items-center justify-center rounded-md hover:bg-neutral-100 text-neutral-500 hover:text-neutral-700 transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-neutral-100 text-neutral-500 hover:text-neutral-700 transition-colors outline-none focus:ring-2 focus:ring-accent/20"
               >
-                <HiMiniXMark size={20} />
+                <X size={18} />
               </RdxDialog.Close>
             </div>
           </div>

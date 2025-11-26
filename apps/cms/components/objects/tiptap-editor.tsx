@@ -6,6 +6,9 @@ import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
 import { useEffect } from 'react'
 
+import { Bold, Italic, Underline as UnderlineIcon, Heading1, Heading2, Heading3, List, ListOrdered } from "lucide-react"
+import { Button } from "@/components/ui"
+
 type TiptapEditorProps = {
 	value: string | object | null
 	onChange: (value: object | null) => void
@@ -32,6 +35,7 @@ export function TiptapEditor({
 	className,
 }: TiptapEditorProps) {
 	const editor = useEditor({
+        immediatelyRender: false,
 		extensions: [
 			StarterKit,
 			Underline,
@@ -88,97 +92,81 @@ export function TiptapEditor({
 	return (
 		<div className={className}>
 			<div className="border border-neutral-200 rounded-md focus-within:border-neutral-300 focus-within:ring-1 focus-within:ring-accent/20 transition-colors">
-				<div className="border-b border-neutral-200 p-2 flex gap-2 flex-wrap">
-					<button
+				<div className="border-b border-neutral-200 p-2 flex gap-1 flex-wrap bg-neutral-50/50">
+					<Button
 						type="button"
 						onClick={() => editor.chain().focus().toggleBold().run()}
-						className={`px-2 py-1 rounded text-sm font-semibold transition-colors ${
-							editor.isActive('bold')
-								? 'bg-neutral-200 text-neutral-900'
-								: 'text-neutral-600 hover:bg-neutral-100'
-						}`}
+                        variant={editor.isActive('bold') ? "secondary-gray" : "ghost"}
+                        size="icon"
+                        className="h-8 w-8"
 					>
-						B
-					</button>
-					<button
+						<Bold size={16} />
+					</Button>
+					<Button
 						type="button"
 						onClick={() => editor.chain().focus().toggleItalic().run()}
-						className={`px-2 py-1 rounded text-sm italic transition-colors ${
-							editor.isActive('italic')
-								? 'bg-neutral-200 text-neutral-900'
-								: 'text-neutral-600 hover:bg-neutral-100'
-						}`}
+                        variant={editor.isActive('italic') ? "secondary-gray" : "ghost"}
+                        size="icon"
+                        className="h-8 w-8"
 					>
-						I
-					</button>
-					<button
+						<Italic size={16} />
+					</Button>
+					<Button
 						type="button"
 						onClick={() => editor.chain().focus().toggleUnderline().run()}
-						className={`px-2 py-1 rounded text-sm underline transition-colors ${
-							editor.isActive('underline')
-								? 'bg-neutral-200 text-neutral-900'
-								: 'text-neutral-600 hover:bg-neutral-100'
-						}`}
+                        variant={editor.isActive('underline') ? "secondary-gray" : "ghost"}
+                        size="icon"
+                        className="h-8 w-8"
 					>
-						U
-					</button>
-					<div className="w-px bg-neutral-200" />
-					<button
+						<UnderlineIcon size={16} />
+					</Button>
+					<div className="w-px bg-neutral-200 mx-1" />
+					<Button
 						type="button"
 						onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-						className={`px-2 py-1 rounded text-sm transition-colors ${
-							editor.isActive('heading', { level: 1 })
-								? 'bg-neutral-200 text-neutral-900'
-								: 'text-neutral-600 hover:bg-neutral-100'
-						}`}
+                        variant={editor.isActive('heading', { level: 1 }) ? "secondary-gray" : "ghost"}
+                        size="icon"
+                        className="h-8 w-8"
 					>
-						H1
-					</button>
-					<button
+						<Heading1 size={16} />
+					</Button>
+					<Button
 						type="button"
 						onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-						className={`px-2 py-1 rounded text-sm transition-colors ${
-							editor.isActive('heading', { level: 2 })
-								? 'bg-neutral-200 text-neutral-900'
-								: 'text-neutral-600 hover:bg-neutral-100'
-						}`}
+                        variant={editor.isActive('heading', { level: 2 }) ? "secondary-gray" : "ghost"}
+                        size="icon"
+                        className="h-8 w-8"
 					>
-						H2
-					</button>
-					<button
+						<Heading2 size={16} />
+					</Button>
+					<Button
 						type="button"
 						onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-						className={`px-2 py-1 rounded text-sm transition-colors ${
-							editor.isActive('heading', { level: 3 })
-								? 'bg-neutral-200 text-neutral-900'
-								: 'text-neutral-600 hover:bg-neutral-100'
-						}`}
+                        variant={editor.isActive('heading', { level: 3 }) ? "secondary-gray" : "ghost"}
+                        size="icon"
+                        className="h-8 w-8"
 					>
-						H3
-					</button>
-					<div className="w-px bg-neutral-200" />
-					<button
+						<Heading3 size={16} />
+					</Button>
+					<div className="w-px bg-neutral-200 mx-1" />
+					<Button
 						type="button"
 						onClick={() => editor.chain().focus().toggleBulletList().run()}
-						className={`px-2 py-1 rounded text-sm transition-colors ${
-							editor.isActive('bulletList')
-								? 'bg-neutral-200 text-neutral-900'
-								: 'text-neutral-600 hover:bg-neutral-100'
-						}`}
+                        variant={editor.isActive('bulletList') ? "secondary-gray" : "ghost"}
+                        size="icon"
+                        className="h-8 w-8"
 					>
-						•
-					</button>
-					<button
+						<List size={16} />
+					</Button>
+					<Button
 						type="button"
 						onClick={() => editor.chain().focus().toggleOrderedList().run()}
-						className={`px-2 py-1 rounded text-sm transition-colors ${
-							editor.isActive('orderedList')
-								? 'bg-neutral-200 text-neutral-900'
-								: 'text-neutral-600 hover:bg-neutral-100'
-						}`}
+                        variant={editor.isActive('orderedList') ? "secondary-gray" : "ghost"}
+                        size="icon"
+                        className="h-8 w-8"
 					>
-						1.
-					</button>
+						<ListOrdered size={16} />
+					</Button>
 				</div>
 				<EditorContent editor={editor} />
 			</div>

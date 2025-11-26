@@ -26,7 +26,7 @@ function SignInWithGoogle() {
       title="Sign in with Google"
       isLoading={isLoading}
       variant="secondary"
-      className="w-full rounded-sm bg-red-100 border-black hover:bg-red-200 hover:border-red-500 cursor-pointer"
+      className="w-full h-11 text-base shadow-sm border border-neutral-200 hover:bg-neutral-50"
     />
   );
 }
