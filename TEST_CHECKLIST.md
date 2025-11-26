@@ -84,7 +84,7 @@
 - [ ] **AASA content-type**: Verify response has correct headers (no `Content-Type` or `application/json`)
 - [ ] **Asset Links file**: ❌ **MISSING** - Create `apps/cms/public/.well-known/assetlinks.json`
 - [ ] **Asset Links hosted**: Test `curl https://cms.apolloview.app/.well-known/assetlinks.json` - verify returns file
-- [ ] **Bundle ID matches**: Verify AASA `appID` matches `app.json` bundle identifier (format: `TEAM_ID.com.apolloview.app`)
+- [ ] **Bundle ID matches**: Verify AASA `appID` matches `app.json` bundle identifier (format: `TEAM_ID.app.apolloview.app`)
 - [ ] **Package name matches**: Verify assetlinks `package_name` matches Android package name
 - [ ] **Associated domains**: Verify `app.json` has `associatedDomains: ["applinks:cms.apolloview.app"]` ✅
 - [ ] **iOS verification**: 

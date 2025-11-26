@@ -5,6 +5,7 @@ import 'react-native-reanimated'
 import { QueryProvider } from '@/src/providers/QueryProvider'
 import { ThemeProvider } from '@/src/providers/ThemeProvider'
 import { LibraryPrefetcher } from '@/src/components/LibraryPrefetcher'
+import { OpenInAppBanner } from '@/src/components/OpenInAppBanner'
 import { useFonts } from 'expo-font'
 
 import { useColorScheme } from '@/hooks/use-color-scheme'
@@ -36,6 +37,7 @@ function RootLayoutContent() {
 		<QueryProvider>
 			<LibraryPrefetcher />
 			<NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+				<OpenInAppBanner />
 				<Stack screenOptions={{ headerShown: false }}>
 					<Stack.Screen name="(tabs)" />
 					<Stack.Screen 

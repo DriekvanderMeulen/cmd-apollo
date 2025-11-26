@@ -13,7 +13,7 @@ These files enable universal links (iOS) and app links (Android) for the app.
 
 1. When building the app with EAS Build, you'll get a Team ID
 2. Update the `TEAM_ID` placeholder in `apple-app-site-association` with your actual Apple Team ID
-3. The file format should be: `TEAM_ID.com.apolloview.app` (e.g., `ABC123DEFG.com.apolloview.app`)
+3. The file format should be: `TEAM_ID.app.apolloview.app` (e.g., `ABC123DEFG.app.apolloview.app`)
 
 ### Android (assetlinks.json)
 

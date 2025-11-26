@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.apolloview.app",
+      "bundleIdentifier": "app.apolloview.app",
       "associatedDomains": [
         "applinks:cms.apolloview.app",
         "applinks:app.apolloview.app",
