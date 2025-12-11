@@ -2,42 +2,44 @@ import Link from "next/link";
 
 function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen w-full flex-row overflow-hidden bg-white">
-      <div className="flex h-full w-full lg:w-1/2 px-2 flex-col items-center justify-between relative z-10">
-        <div className="flex h-24 w-full items-center gap-2 text-xl font-bold text-neutral-900">
-          <div className="h-8 w-8 bg-neutral-900 rounded-lg" />
-          <span>ApolloView CMS</span>
-        </div>
-        <div className="w-full max-w-[440px]">{children}</div>
-        <div className="flex h-24 w-full flex-col justify-center gap-1 text-xs text-neutral-500 font-medium">
-          <Link
-            href="/privacy-terms-conditions-cookies"
-            className="hover:text-neutral-700 transition-colors"
-          >
-            Privacy, Algemene voorwaarden en Cookie beleid
-          </Link>
-          <Link
-            target="_blank"
-            href="https://www.driek.dev"
-            className="hover:text-neutral-700 transition-colors"
-          >
-            Product door{" "}
-            <strong className="font-semibold text-neutral-700">
-              DRIEK.DEV in samenwerking met CMD Maastricht
-            </strong>
-          </Link>
+    <div className="relative flex min-h-screen w-full overflow-hidden bg-[rgb(var(--surface))] text-[rgb(var(--color-neutral-900))]">
+			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(var(--color-primary),0.12),transparent_30%),radial-gradient(circle_at_82%_8%,rgba(var(--color-accent),0.14),transparent_30%)]" />
+      <div className="relative z-10 flex w-full flex-col items-center justify-center px-4 py-10 sm:px-8 lg:w-1/2 lg:px-12">
+        <div className="w-full max-w-[520px] rounded-2xl bg-[rgb(var(--surface-muted))] p-8 shadow-md ring-1 ring-[rgba(var(--border),0.8)] backdrop-blur sm:p-10">
+          <div className="flex items-center gap-2 text-xl font-semibold text-[rgb(var(--color-neutral-900))]">
+            <div className="leading-tight">
+              <div className="text-sm font-medium text-[rgb(var(--color-neutral-500))]">
+                ApolloView
+              </div>
+              <div className="text-base font-semibold">Studentenportaal</div>
+            </div>
+          </div>
+          <div className="mt-8">{children}</div>
+          <div className="mt-10 flex flex-col gap-2 text-xs font-medium text-[rgb(var(--color-neutral-500))]">
+            <Link
+              href="/privacy-terms-conditions-cookies"
+              className="transition-colors hover:text-[rgb(var(--color-neutral-700))]"
+            >
+              Privacy, Algemene voorwaarden en Cookie beleid
+            </Link>
+            <Link
+              target="_blank"
+              href="https://www.driek.dev"
+              className="transition-colors hover:text-[rgb(var(--color-neutral-700))]"
+            >
+              Product door{" "}
+              <strong className="font-semibold text-[rgb(var(--color-neutral-800))]">
+                DRIEK.DEV in samenwerking met CMD Maastricht
+              </strong>
+            </Link>
+          </div>
         </div>
       </div>
-      <div
-        className="hidden lg:flex w-1/2 relative bg-neutral-100"
-      >
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/bg-image.jpg')" }} 
-        />
-        <div className="absolute inset-0 bg-neutral-900/10" />
+      <div className="relative hidden w-1/2 overflow-hidden lg:block">
+        <div className="absolute inset-0 bg-gradient-to-br from-[rgb(var(--color-primary))] via-[rgb(var(--color-accent))] to-[rgba(var(--color-primary),0.25)] opacity-80" />
+        <div className="absolute inset-0 bg-cover bg-center mix-blend-overlay" style={{ backgroundImage: "url('/bg-image.jpg')" }} />
       </div>
-    </div>  
+    </div>
   );
 }
 

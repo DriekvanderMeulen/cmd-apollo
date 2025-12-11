@@ -254,9 +254,13 @@ export function ObjectViewer({ objectData, onClose }: ObjectViewerProps) {
 				{firstIteration ? (
 					<Animated.View style={[showIterationsButtonOpacity, { position: 'absolute', bottom: 0, left: 0, right: 0 }]}>
 						<SafeAreaView edges={['bottom']} style={styles.bottomSafeArea}>
-							<ThemedView lightColor="#81C7B4" darkColor="#EBBED3" style={styles.nextButton}>
-								<ThemedText style={styles.nextButtonText} lightColor="#000000" darkColor="#000000">Show Iterations</ThemedText>
-							</ThemedView>
+							<Pressable onPress={handleShowIterations} style={{ width: '100%' }}>
+								<ThemedView lightColor="#81C7B4" darkColor="#EBBED3" style={styles.nextButton}>
+									<ThemedText style={styles.nextButtonText} lightColor="#000000" darkColor="#000000">
+										Show Iterations
+									</ThemedText>
+								</ThemedView>
+							</Pressable>
 						</SafeAreaView>
 					</Animated.View>
 				) : null}
@@ -264,14 +268,18 @@ export function ObjectViewer({ objectData, onClose }: ObjectViewerProps) {
 					<SafeAreaView edges={['bottom']} style={styles.bottomSafeArea}>
 						<View style={styles.navigationButtons}>
 							<Animated.View style={previousButtonOpacity}>
-								<ThemedView lightColor="#81C7B4" darkColor="#EBBED3" style={styles.navButton}>
-									<Ionicons name="chevron-back" size={24} color="#000000" />
-								</ThemedView>
+								<Pressable onPress={handleSwipeRight} hitSlop={10}>
+									<ThemedView lightColor="#81C7B4" darkColor="#EBBED3" style={styles.navButton}>
+										<Ionicons name="chevron-back" size={24} color="#000000" />
+									</ThemedView>
+								</Pressable>
 							</Animated.View>
 							<Animated.View style={nextButtonOpacity}>
-								<ThemedView lightColor="#81C7B4" darkColor="#EBBED3" style={styles.navButton}>
-									<Ionicons name="chevron-forward" size={24} color="#000000" />
-								</ThemedView>
+								<Pressable onPress={handleSwipeLeft} hitSlop={10}>
+									<ThemedView lightColor="#81C7B4" darkColor="#EBBED3" style={styles.navButton}>
+										<Ionicons name="chevron-forward" size={24} color="#000000" />
+									</ThemedView>
+								</Pressable>
 							</Animated.View>
 						</View>
 					</SafeAreaView>

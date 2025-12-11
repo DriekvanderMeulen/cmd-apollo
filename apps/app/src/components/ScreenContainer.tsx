@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ThemedText } from '@/components/themed-text'
 import { useTheme } from '@/src/providers/ThemeProvider'
@@ -24,10 +24,7 @@ export function ScreenContainer({ title, children }: ScreenContainerProps): Reac
 			<ThemedText style={styles.title} type="title">
 				{title}
 			</ThemedText>
-			{/* Content area respects safe insets + padding */}
-			<SafeAreaView style={styles.content} edges={['left', 'right', 'bottom']}>
-				{children}
-			</SafeAreaView>
+			<View style={styles.content}>{children}</View>
 		</SafeAreaView>
 	)
 }

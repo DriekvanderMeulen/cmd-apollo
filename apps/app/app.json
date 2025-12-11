@@ -24,7 +24,29 @@
       ],
       "infoPlist": {
         "NSCameraUsageDescription": "This app needs access to your camera to scan QR codes.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleIcons": {
+          "CFBundleAlternateIcons": {
+            "icon-margins": {
+              "CFBundleIconFiles": [
+                "icon-margins"
+              ],
+              "UIPrerenderedIcon": true
+            },
+            "icon-heart": {
+              "CFBundleIconFiles": [
+                "icon-heart"
+              ],
+              "UIPrerenderedIcon": true
+            },
+            "icon-alpha": {
+              "CFBundleIconFiles": [
+                "icon-alpha"
+              ],
+              "UIPrerenderedIcon": true
+            }
+          }
+        }
       }
     },
     "android": {

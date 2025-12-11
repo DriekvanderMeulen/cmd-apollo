@@ -12,6 +12,7 @@ interface IterationFormProps {
     date: Date;
     description: string | object | null;
   };
+  objectPublicId: string;
   onSave: (data: {
     title: string;
     date: Date;
@@ -24,6 +25,7 @@ interface IterationFormProps {
 
 export function IterationForm({
   initialData,
+  objectPublicId,
   onSave,
   onCancel,
   isLoading = false,
@@ -88,46 +90,57 @@ export function IterationForm({
     }
   };
 
+	const controlClassName =
+		'h-10 w-full rounded-lg border border-[rgba(var(--border),0.9)] bg-[rgb(var(--surface))] px-3 text-sm text-[rgb(var(--color-neutral-900))] shadow-sm outline-none transition duration-150 ease-out placeholder:text-[rgb(var(--color-neutral-500))] focus:border-[rgba(var(--ring),0.7)] focus:ring-2 focus:ring-[rgba(var(--ring),0.22)]';
+
+	const labelClassName =
+		'mb-1.5 block text-sm font-medium text-[rgb(var(--color-neutral-700))]';
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="block mb-1.5 text-sm font-medium text-neutral-700">
-          Title <span className="text-red-500">*</span>
+        <label className={labelClassName}>
+          Title <span className="text-[rgb(var(--color-accent))]">*</span>
         </label>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="h-9 w-full rounded-md px-3 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors"
+          className={controlClassName}
           placeholder="Enter iteration title..."
           required
         />
       </div>
 
       <div>
-        <label className="block mb-1.5 text-sm font-medium text-neutral-700">
+        <label className={labelClassName}>
           Date
         </label>
         <DatePicker
           selected={date}
           onChange={(date) => setDate(date || new Date())}
           dateFormat="yyyy-MM-dd"
-          className="h-9 w-full rounded-md px-3 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors"
+          className={controlClassName}
           showPopperArrow={false}
         />
       </div>
 
       <div>
-        <label className="block mb-1.5 text-sm font-medium text-neutral-700">
+        <label className={labelClassName}>
           Description
         </label>
         <TiptapEditor
           value={description}
           onChange={(value) => setDescription(value)}
           placeholder="Enter iteration description..."
+          uploadUrl={
+            initialData?.id
+              ? `/api/v1/objects/public/${objectPublicId}/iterations/${initialData.id}/images`
+              : null
+          }
         />
       </div>
 
-      <div className="flex justify-end gap-2 pt-2">
+      <div className="flex flex-wrap items-center justify-end gap-3 pt-3">
         <Button
           type="button"
           variant="secondary"

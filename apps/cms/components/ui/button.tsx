@@ -22,20 +22,20 @@ interface ButtonLinkProps extends LinkProps, BaseButtonProps {
 }
 
 const variants = cva(
-  "rounded-md transition-colors justify-center space-x-2 inline-flex items-center font-medium border border-transparent",
+  "rounded-md transition-colors justify-center space-x-2 inline-flex items-center font-medium border border-transparent disabled:cursor-not-allowed disabled:opacity-70",
   {
     variants: {
       variant: {
         primary:
-          "text-white bg-accent hover:bg-accent/90 active:bg-accent/80 shadow-sm",
+          "text-white bg-accent hover:bg-accent/90 active:bg-accent/80 shadow-sm disabled:bg-neutral-200 disabled:text-neutral-500 disabled:border-neutral-200",
         secondary:
-          "text-neutral-700 bg-white border-neutral-200 hover:bg-neutral-50 shadow-sm",
+          "text-neutral-700 bg-white border-neutral-200 hover:bg-neutral-50 shadow-sm disabled:text-neutral-500 disabled:bg-neutral-100 disabled:border-neutral-200",
         "secondary-gray":
-          "text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80",
+          "text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 disabled:text-neutral-500 disabled:bg-neutral-100 disabled:border-neutral-200",
         ghost:
-          "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900",
+          "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 disabled:text-neutral-400 disabled:hover:bg-transparent",
         danger:
-          "text-white bg-red-600 hover:bg-red-700 active:bg-red-800 shadow-sm",
+          "text-white bg-red-600 hover:bg-red-700 active:bg-red-800 shadow-sm disabled:bg-neutral-200 disabled:text-neutral-500 disabled:border-neutral-200",
       },
       size: {
         default: "h-9 px-4 text-sm",

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, View, StyleSheet } from 'react-native'
+import { Text, View, StyleSheet, Image } from 'react-native'
 import { ThemedText } from '@/components/themed-text'
 import { useThemeColor } from '@/hooks/use-theme-color'
 
@@ -106,6 +106,29 @@ function renderBlockNode(node: TipTapNode, baseStyle: any, index: number): React
 		)
 	}
 
+	if (node.type === 'image') {
+		const uri = typeof node.attrs?.src === 'string' ? node.attrs.src : null
+		if (!uri) return null
+
+		const alt = (node.attrs?.alt as string) || 'Image'
+		const title = (node.attrs?.title as string) || null
+
+		return (
+			<View key={key} style={styles.block}>
+				<Image
+					source={{ uri }}
+					style={styles.image}
+					resizeMode="cover"
+					accessible
+					accessibilityLabel={alt}
+				/>
+				{title ? (
+					<Text style={styles.caption}>{title}</Text>
+				) : null}
+			</View>
+		)
+	}
+
 	if (node.type === 'bulletList' || node.type === 'orderedList') {
 		const isOrdered = node.type === 'orderedList'
 		const listItems = node.content || []
@@ -201,5 +224,16 @@ const styles = StyleSheet.create({
 	listItem: {
 		marginBottom: 8,
 		paddingLeft: 8,
+	},
+	image: {
+		width: '100%',
+		height: 220,
+		borderRadius: 8,
+		backgroundColor: '#f1f1f1',
+	},
+	caption: {
+		marginTop: 8,
+		fontSize: 14,
+		opacity: 0.7,
 	},
 })

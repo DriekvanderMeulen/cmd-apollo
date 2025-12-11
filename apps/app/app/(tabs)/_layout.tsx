@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router'
 import React from 'react'
 import { Ionicons } from '@expo/vector-icons'
+import { Platform } from 'react-native'
 
 import { HapticTab } from '@/components/haptic-tab'
 import { Colors } from '@/constants/theme'
@@ -31,24 +32,28 @@ export default function TabLayout() {
 					),
 				}}
 			/>
-			<Tabs.Screen
-				name="scan"
-				options={{
-					title: 'Scan',
-					tabBarIcon: ({ color, size, focused }) => (
-						<Ionicons name={focused ? 'scan' : 'scan-outline'} color={color} size={size} />
-					),
-				}}
-			/>
-			<Tabs.Screen
-				name="settings"
-				options={{
-					title: 'Settings',
-					tabBarIcon: ({ color, size, focused }) => (
-						<Ionicons name={focused ? 'settings' : 'settings-outline'} color={color} size={size} />
-					),
-				}}
-			/>
+			{Platform.OS !== 'web' ? (
+				<Tabs.Screen
+					name="scan"
+					options={{
+						title: 'Scan',
+						tabBarIcon: ({ color, size, focused }) => (
+							<Ionicons name={focused ? 'scan' : 'scan-outline'} color={color} size={size} />
+						),
+					}}
+				/>
+			) : null}
+			{Platform.OS !== 'web' ? (
+				<Tabs.Screen
+					name="settings"
+					options={{
+						title: 'Settings',
+						tabBarIcon: ({ color, size, focused }) => (
+							<Ionicons name={focused ? 'settings' : 'settings-outline'} color={color} size={size} />
+						),
+					}}
+				/>
+			) : null}
 		</Tabs>
 	)
 }

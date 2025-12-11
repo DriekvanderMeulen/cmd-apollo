@@ -20,10 +20,13 @@ function WebVideoPlayer({
 	const videoRef = useRef<HTMLVideoElement>(null)
 	const [isLoading, setIsLoading] = useState(true)
 	const [hasError, setHasError] = useState(false)
+	const [isMuted, setIsMuted] = useState(true)
 
 	useEffect(() => {
 		const video = videoRef.current
 		if (!video) return
+
+		video.muted = true
 
 		const handleCanPlay = () => {
 			setIsLoading(false)
@@ -53,6 +56,21 @@ function WebVideoPlayer({
 			video.removeEventListener('error', handleError)
 		}
 	}, [onComplete])
+
+	function handleToggleMute() {
+		const video = videoRef.current
+		if (!video) return
+
+		const nextMuted = !isMuted
+		video.muted = nextMuted
+		setIsMuted(nextMuted)
+
+		if (video.paused) {
+			video.play().catch(() => {
+				// Autoplay might still be blocked; ignore
+			})
+		}
+	}
 
 	if (hasError) {
 		return (
@@ -94,8 +112,20 @@ function WebVideoPlayer({
 				controls={false}
 				playsInline
 				autoPlay
-				muted={false}
+				muted={isMuted}
 			/>
+			{isMuted ? (
+				<View style={styles.unmuteOverlay} pointerEvents="none">
+					<ThemedText style={styles.unmuteText}>Click to unmute</ThemedText>
+				</View>
+			) : null}
+			<View style={StyleSheet.absoluteFill} pointerEvents="auto">
+				<View
+					style={StyleSheet.absoluteFill}
+					onStartShouldSetResponder={() => true}
+					onResponderRelease={handleToggleMute}
+				/>
+			</View>
 			{isLoading ? (
 				<View style={styles.loadingOverlay}>
 					<ActivityIndicator size="large" />
@@ -299,5 +329,20 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		paddingVertical: 12,
 		paddingHorizontal: 24,
+	},
+	unmuteOverlay: {
+		position: 'absolute',
+		bottom: 24,
+		left: 0,
+		right: 0,
+		alignItems: 'center',
+	},
+	unmuteText: {
+		backgroundColor: 'rgba(0, 0, 0, 0.6)',
+		color: '#fff',
+		paddingVertical: 8,
+		paddingHorizontal: 16,
+		borderRadius: 16,
+		fontWeight: '600',
 	},
 })

@@ -48,7 +48,7 @@ function Navigation({ user }: NavigationProps) {
   const pathname = usePathname();
 
   return (
-    <header className="flex h-full w-64 shrink-0 flex-col justify-between bg-surface-sidebar border-r border-neutral-200 pb-5 px-3 pt-3">
+    <header className="sticky top-0 relative z-20 flex h-screen w-64 shrink-0 flex-col justify-between border-r border-[rgba(var(--border),0.9)] bg-[rgb(var(--surface-sidebar))] px-3 pb-5 pt-3">
       <div>
         <div className="mb-4 flex w-full items-center justify-between px-2 py-2">
           <div className="flex items-center space-x-2">

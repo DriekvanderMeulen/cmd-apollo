@@ -3,34 +3,34 @@
 @theme {
   --font-family-sans: var(--font-sf);
 
-  /* Brand tokens - Notion-inspired blue-gray accent */
-  --color-primary: 55 53 47; /* Notion's dark text color */
-  --color-accent: 35 131 226; /* Notion blue for accents */
-  --color-base-black: #37352F;
+  /* Brand tokens - vibrant indigo/tangerine duo */
+  --color-primary: 48 61 255; /* electric indigo */
+  --color-accent: 241 136 5; /* tangerine pop */
+  --color-base-black: #0f121a;
   --color-base-white: #ffffff;
 
-  /* Neutral scale (Notion-inspired light palette) */
-  --color-neutral-50: 251 251 250; /* Very light warm gray */
-  --color-neutral-100: 247 246 243; /* Notion sidebar bg */
-  --color-neutral-200: 233 232 228; /* Light borders */
-  --color-neutral-300: 227 226 224;
-  --color-neutral-400: 155 154 151; /* Muted text */
-  --color-neutral-500: 120 119 116;
-  --color-neutral-600: 100 99 96;
-  --color-neutral-700: 73 72 70;
-  --color-neutral-800: 55 53 47; /* Primary text */
-  --color-neutral-900: 37 35 31; /* Darkest text */
-  --color-neutral-950: 25 23 17;
+  /* Neutral scale (cool, high-contrast friendly) */
+  --color-neutral-50: 248 250 252;
+  --color-neutral-100: 241 245 249;
+  --color-neutral-200: 226 232 240;
+  --color-neutral-300: 203 213 225;
+  --color-neutral-400: 148 163 184;
+  --color-neutral-500: 100 116 139;
+  --color-neutral-600: 71 85 105;
+  --color-neutral-700: 51 65 85;
+  --color-neutral-800: 30 41 59;
+  --color-neutral-900: 15 23 42;
+  --color-neutral-950: 5 10 25;
 
-  /* Surfaces and borders (Notion-inspired) */
-  --surface: 255 255 255; /* Pure white main content */
-  --surface-muted: 251 251 250; /* Slightly warm off-white */
-  --surface-sidebar: 247 246 243; /* Sidebar background */
-  --surface-contrast: 37 35 31;
-  --border: 233 232 228; /* Lighter, softer borders */
-  --ring: 35 131 226; /* Blue accent for focus */
+  /* Surfaces and borders */
+  --surface: 248 250 252; /* page */
+  --surface-muted: 236 239 244; /* cards */
+  --surface-sidebar: 230 234 241; /* sidebar/topbar */
+  --surface-contrast: 15 23 42; /* strong text on light */
+  --border: 221 226 234;
+  --ring: 96 165 250; /* bright focus */
 
-  /* Radii - Notion uses softer, less rounded corners */
+  /* Radii */
   --radius-ui: 6px;
   --radius-ui-lg: 12px;
   --radius-ui-sm: 4px;
@@ -78,22 +78,22 @@
 
 /* Shadow tokens (Notion-inspired - softer, more subtle) */
 :root {
-  --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.03);
-  --shadow: 0 1px 3px 0 rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.04);
-  --shadow-md: 0 2px 4px -1px rgba(0,0,0,0.06), 0 2px 3px -2px rgba(0,0,0,0.05);
-  --shadow-lg: 0 8px 12px -3px rgba(0,0,0,0.08), 0 3px 5px -3px rgba(0,0,0,0.06);
-  --shadow-xl: 0 16px 20px -5px rgba(0,0,0,0.1), 0 8px 8px -5px rgba(0,0,0,0.04);
-  --shadow-inner: inset 0 2px 4px 0 rgba(0,0,0,0.04);
+  --shadow-sm: 0 1px 2px 0 rgba(15,18,26,0.05);
+  --shadow: 0 2px 4px 0 rgba(15,18,26,0.06), 0 1px 3px -1px rgba(15,18,26,0.05);
+  --shadow-md: 0 6px 10px -2px rgba(15,18,26,0.08), 0 3px 6px -3px rgba(15,18,26,0.06);
+  --shadow-lg: 0 12px 18px -4px rgba(15,18,26,0.1), 0 5px 8px -4px rgba(15,18,26,0.07);
+  --shadow-xl: 0 18px 30px -6px rgba(15,18,26,0.12), 0 8px 12px -6px rgba(15,18,26,0.08);
+  --shadow-inner: inset 0 2px 4px 0 rgba(15,18,26,0.06);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.35);
-    --shadow: 0 1px 3px 0 rgba(0,0,0,0.5), 0 1px 2px -1px rgba(0,0,0,0.4);
-    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.5), 0 2px 4px -2px rgba(0,0,0,0.45);
-    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.55), 0 4px 6px -4px rgba(0,0,0,0.45);
-    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.6), 0 10px 10px -5px rgba(0,0,0,0.45);
-    --shadow-inner: inset 0 2px 4px 0 rgba(0,0,0,0.35);
+    --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.25);
+    --shadow: 0 2px 4px 0 rgba(0,0,0,0.35), 0 1px 3px -1px rgba(0,0,0,0.25);
+    --shadow-md: 0 6px 10px -2px rgba(0,0,0,0.4), 0 3px 6px -3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 12px 18px -4px rgba(0,0,0,0.45), 0 5px 8px -4px rgba(0,0,0,0.32);
+    --shadow-xl: 0 18px 30px -6px rgba(0,0,0,0.5), 0 8px 12px -6px rgba(0,0,0,0.36);
+    --shadow-inner: inset 0 2px 4px 0 rgba(0,0,0,0.32);
   }
 }
 
@@ -108,31 +108,30 @@ body {
 @media (prefers-color-scheme: dark) {
   :root {
     /* Neutral scale tuned for dark */
-    --color-neutral-50: 250 250 250;
-    --color-neutral-100: 245 245 245;
-    --color-neutral-200: 229 229 229;
-    --color-neutral-300: 212 212 212;
-    --color-neutral-400: 163 163 163;
-    --color-neutral-500: 115 115 115;
-    --color-neutral-600: 94 94 94;
-    --color-neutral-700: 72 72 72;
-    --color-neutral-800: 41 41 41;
-    --color-neutral-900: 230 230 230;
-    --color-neutral-950: 245 245 245;
+    --color-neutral-50: 249 250 251;
+    --color-neutral-100: 244 246 249;
+    --color-neutral-200: 229 232 239;
+    --color-neutral-300: 207 214 227;
+    --color-neutral-400: 160 173 195;
+    --color-neutral-500: 133 146 172;
+    --color-neutral-600: 94 110 144;
+    --color-neutral-700: 73 85 113;
+    --color-neutral-800: 38 46 66;
+    --color-neutral-900: 232 236 244;
+    --color-neutral-950: 245 247 252;
 
     /* Surfaces and borders */
-    --surface: 17 19 24; /* near-neutral-900 */
-    --surface-muted: 28 31 39; /* card */
-    --surface-contrast: 255 255 255;
-    --border: 45 49 60; /* subtle border */
-    --ring: 241 136 5; /* tangerine ring */
+    --surface: 16 19 30; /* page */
+    --surface-muted: 25 30 44; /* cards */
+    --surface-contrast: 245 247 252;
+    --border: 40 48 66;
+    --ring: 125 194 255; /* brighter focus */
 
-    /* Primary remains tangerine for contrast */
-    --color-primary: 241 136 5;
+    --color-primary: 125 178 255; /* softer indigo in dark */
   }
 
   body {
-    @apply bg-[rgb(var(--surface))] text-neutral-100;
+    @apply bg-[rgb(var(--surface))] text-[rgb(var(--color-neutral-100))];
   }
 }
 
@@ -272,15 +271,18 @@ body {
 }
 
 .tiptap h2 {
-  @apply text-xl font-bold mt-6 mb-3 first:mt-0 text-neutral-900;
+  @apply text-xl font-bold mt-6 mb-3 first:mt-0;
+  color: rgb(var(--color-neutral-900));
 }
 
 .tiptap h3 {
-  @apply text-lg font-bold mt-5 mb-2 first:mt-0 text-neutral-900;
+  @apply text-lg font-bold mt-5 mb-2 first:mt-0;
+  color: rgb(var(--color-neutral-900));
 }
 
 .tiptap h4 {
-  @apply text-base font-bold mt-4 mb-2 first:mt-0 text-neutral-900;
+  @apply text-base font-bold mt-4 mb-2 first:mt-0;
+  color: rgb(var(--color-neutral-900));
 }
 
 .tiptap p {
@@ -300,11 +302,17 @@ body {
 }
 
 .tiptap code {
-  @apply bg-neutral-100 text-neutral-800 px-1 py-0.5 rounded text-sm font-mono;
+  @apply px-1 py-0.5 rounded text-sm font-mono;
+  background: rgb(var(--surface-muted));
+  color: rgb(var(--color-neutral-900));
+  border: 1px solid rgba(var(--border), 0.7);
 }
 
 .tiptap pre {
-  @apply bg-neutral-100 text-neutral-800 p-3 rounded-md overflow-x-auto my-3;
+  @apply p-3 rounded-md overflow-x-auto my-3 border;
+  background: rgb(var(--surface-muted));
+  color: rgb(var(--color-neutral-900));
+  border-color: rgba(var(--border), 0.8);
 }
 
 .tiptap pre code {
@@ -312,11 +320,18 @@ body {
 }
 
 .tiptap blockquote {
-  @apply border-l-4 border-neutral-300 pl-4 italic my-3;
+  @apply pl-4 italic my-3;
+  border-left: 3px solid rgba(var(--border), 0.8);
+  color: rgb(var(--color-neutral-700));
 }
 
 .tiptap a {
-  @apply text-blue-600 underline hover:text-blue-800;
+  @apply underline transition-colors;
+  color: rgb(var(--color-primary));
+}
+
+.tiptap a:hover {
+  color: rgb(var(--color-accent));
 }
 
 .tiptap strong {

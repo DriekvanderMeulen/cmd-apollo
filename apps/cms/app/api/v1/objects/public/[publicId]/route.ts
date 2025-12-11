@@ -50,6 +50,46 @@ async function generateSignedUrl(key: string): Promise<string | null> {
 	}
 }
 
+function looksLikeR2Key(value: string): boolean {
+	return !/^https?:\/\//i.test(value)
+}
+
+async function enrichRichTextWithSignedImages(content: unknown): Promise<unknown> {
+	if (!content || typeof content !== 'object') return content
+
+	async function processNode(node: any): Promise<any> {
+		if (!node || typeof node !== 'object') return node
+
+		const processed: any = { ...node }
+
+		if (Array.isArray(node.content)) {
+			processed.content = await Promise.all(node.content.map(processNode))
+		}
+
+		if (node.type === 'image') {
+			const r2Key =
+				typeof node.attrs?.r2Key === 'string'
+					? node.attrs.r2Key
+					: typeof node.attrs?.src === 'string' && looksLikeR2Key(node.attrs.src)
+					? node.attrs.src
+					: null
+
+			if (r2Key) {
+				const signed = await generateSignedUrl(r2Key)
+				processed.attrs = {
+					...(node.attrs || {}),
+					src: signed || node.attrs?.src || null,
+					r2Key,
+				}
+			}
+		}
+
+		return processed
+	}
+
+	return processNode(content)
+}
+
 export async function GET(
 	req: Request,
   { params }: { params: Promise<{ publicId: string }> },
@@ -115,6 +155,26 @@ export async function GET(
 		.where(eq(iterationTable.objectId, objRow.id))
 		.orderBy(asc(iterationTable.date))
 
+	const iterationsWithSignedImages = await Promise.all(
+		iterations.map(async (iteration) => {
+			let parsedDescription: unknown = iteration.description
+			if (typeof iteration.description === 'string') {
+				try {
+					parsedDescription = JSON.parse(iteration.description)
+				} catch {
+					parsedDescription = iteration.description
+				}
+			}
+
+			const enriched = await enrichRichTextWithSignedImages(parsedDescription)
+
+			return {
+				...iteration,
+				description: enriched,
+			}
+		}),
+	)
+
 	// Generate signed URLs for poster and video
 	const posterUrl = objRow.cfR2Link
 		? await generateSignedUrl(objRow.cfR2Link)
@@ -154,7 +214,7 @@ export async function GET(
 			: null,
 		posterUrl,
 		videoUrl,
-		iterations,
+		iterations: iterationsWithSignedImages,
 		version: generateVersion({
 			id: objRow.id,
 			title: objRow.title,

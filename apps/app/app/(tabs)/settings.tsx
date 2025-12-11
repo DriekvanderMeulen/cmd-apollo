@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Linking, Pressable, StyleSheet, Switch, View, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
+import { Alert, Linking, Pressable, StyleSheet, Switch, View, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Application from 'expo-application'
 import Constants from 'expo-constants'
@@ -52,12 +52,19 @@ export default function SettingsScreen(): React.JSX.Element {
 		setSelectedIcon(id)
 		try {
 			await AsyncStorage.setItem('selectedIcon', id)
-			if (Platform.OS !== 'web') {
+			if (Platform.OS === 'ios') {
 				const iconName = id === 'default' ? '' : `icon-${id}`
 				await Application.setIconAsync(iconName)
+			} else if (Platform.OS === 'android') {
+				// Icon switching unsupported on Android; persist choice only
+				return
 			}
 		} catch (error) {
 			console.error('Failed to apply icon or save selection:', error)
+			Alert.alert(
+				'App icon not changed',
+				'Alternate icons need a TestFlight/App Store build with alternate icons configured.'
+			)
 		}
 	}
 

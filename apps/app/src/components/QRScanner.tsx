@@ -96,6 +96,10 @@ export function QRScanner(): React.JSX.Element {
 	}
 
 	function handleBarCodeScanned({ data }: { data: string }) {
+		if (scanned) {
+			return
+		}
+
 		// Validate URL origin first
 		let urlObj
 		try {
@@ -121,6 +125,11 @@ export function QRScanner(): React.JSX.Element {
 		Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
 
 		router.push(`/open?token=${encodeURIComponent(token)}`)
+
+		// Allow re-scan after navigation or a short delay
+		setTimeout(() => {
+			setScanned(false)
+		}, 1500)
 	}
 
 	return (
@@ -130,7 +139,7 @@ export function QRScanner(): React.JSX.Element {
 				barcodeScannerSettings={{
 					barcodeTypes: ['qr'],
 				}}
-				onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+				onBarcodeScanned={handleBarCodeScanned}
 			>
 				<View style={styles.overlay}>
 					<View style={styles.scanArea}>

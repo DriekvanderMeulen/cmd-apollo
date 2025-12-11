@@ -47,9 +47,7 @@ export async function GET(req: NextRequest) {
       return new Response("Invalid request", { status: 400 });
     }
 
-    const baseUrl = process.env.VERCEL
-      ? "https://cms.apolloview.app"
-      : "http://localhost:3000";
+    const baseUrl = req.nextUrl.origin;
 
     const google = new Google(
       process.env.GOOGLE_CLIENT_ID!,

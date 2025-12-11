@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { View, StyleSheet, Pressable, ActivityIndicator, Alert, Platform } from 'react-native'
 import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av'
-import { Ionicons } from '@expo/vector-icons'
 import * as Linking from 'expo-linking'
 import { useTheme } from '@/src/providers/ThemeProvider'
 import { Colors } from '@/constants/theme'
@@ -20,7 +19,7 @@ export function VideoPlayer({ videoUri, posterUri, style }: VideoPlayerProps) {
 	const [isMuted, setIsMuted] = useState(true) // Default muted for European autoplay compliance
 	const [isLoading, setIsLoading] = useState(true)
 	const [hasError, setHasError] = useState(false)
-	const [showControls, setShowControls] = useState(true)
+	const webVideoRef = useRef<HTMLVideoElement | null>(null)
 	const { resolvedTheme, isOLED } = useTheme()
 
 	const backgroundColor =
@@ -28,14 +27,48 @@ export function VideoPlayer({ videoUri, posterUri, style }: VideoPlayerProps) {
 	const textColor = resolvedTheme === 'light' ? '#000' : '#fff'
 
 	useEffect(() => {
-		// Hide controls after 3 seconds of inactivity
-		if (isPlaying && showControls) {
-			const timer = setTimeout(() => {
-				setShowControls(false)
-			}, 3000)
-			return () => clearTimeout(timer)
+		if (Platform.OS !== 'web') {
+			return
 		}
-	}, [isPlaying, showControls])
+
+		const video = webVideoRef.current
+		if (!video) {
+			return
+		}
+
+		const handleCanPlay = () => {
+			setIsLoading(false)
+			video.play().catch(() => {
+				// Ignore autoplay block; user will tap to unmute
+			})
+		}
+
+		const handleError = () => {
+			setHasError(true)
+			setIsLoading(false)
+		}
+
+		video.muted = isMuted
+		video.addEventListener('canplay', handleCanPlay)
+		video.addEventListener('error', handleError)
+
+		return () => {
+			video.removeEventListener('canplay', handleCanPlay)
+			video.removeEventListener('error', handleError)
+		}
+	}, [isMuted])
+
+	useEffect(() => {
+		if (Platform.OS === 'web') {
+			return
+		}
+
+		if (status?.isLoaded && !status.isPlaying && videoRef.current) {
+			videoRef.current.playAsync().catch(() => {
+				// Ignore autoplay failures on native
+			})
+		}
+	}, [status])
 
 	function handlePlaybackStatusUpdate(playbackStatus: AVPlaybackStatus) {
 		setStatus(playbackStatus)
@@ -56,42 +89,35 @@ export function VideoPlayer({ videoUri, posterUri, style }: VideoPlayerProps) {
 		}
 	}
 
-	async function handlePlayPause() {
+	async function handleMuteToggle() {
 		try {
+			if (Platform.OS === 'web') {
+				const webVideo = webVideoRef.current
+				if (!webVideo) {
+					return
+				}
+				const nextMuted = !isMuted
+				webVideo.muted = nextMuted
+				setIsMuted(nextMuted)
+				if (webVideo.paused) {
+					webVideo.play().catch(() => {
+						// Ignore autoplay errors after user interaction
+					})
+				}
+				return
+			}
+
 			if (videoRef.current) {
-				if (isPlaying) {
-					await videoRef.current.pauseAsync()
-				} else {
-					// Unmute when user starts playback (user interaction)
-					if (isMuted) {
-						await videoRef.current.setIsMutedAsync(false)
-					}
+				const nextMuted = !isMuted
+				await videoRef.current.setIsMutedAsync(nextMuted)
+				setIsMuted(nextMuted)
+
+				if (!isPlaying) {
 					await videoRef.current.playAsync()
 				}
 			}
 		} catch (error) {
-			console.error('Error toggling playback:', error)
-			setHasError(true)
-		}
-	}
-
-	async function handleMuteToggle() {
-		try {
-			if (videoRef.current) {
-				await videoRef.current.setIsMutedAsync(!isMuted)
-			}
-		} catch (error) {
 			console.error('Error toggling mute:', error)
-		}
-	}
-
-	async function handleFullScreen() {
-		try {
-			if (videoRef.current) {
-				await videoRef.current.presentFullscreenPlayer()
-			}
-		} catch (error) {
-			console.error('Error entering full screen:', error)
 		}
 	}
 
@@ -110,10 +136,10 @@ export function VideoPlayer({ videoUri, posterUri, style }: VideoPlayerProps) {
 	}
 
 	function handleVideoPress() {
-		if (!isPlaying && !hasError) {
-			handlePlayPause()
+		if (hasError) {
+			return
 		}
-		setShowControls(true)
+		handleMuteToggle()
 	}
 
 	if (hasError) {
@@ -136,6 +162,37 @@ export function VideoPlayer({ videoUri, posterUri, style }: VideoPlayerProps) {
 		)
 	}
 
+	if (Platform.OS === 'web') {
+		return (
+			<View style={[styles.container, style]}>
+				<View style={styles.videoWrapper}>
+					{/* @ts-expect-error - HTML video element on web */}
+					<video
+						ref={webVideoRef}
+						src={videoUri}
+						poster={posterUri || undefined}
+						style={styles.video}
+						muted={isMuted}
+						autoPlay
+						playsInline
+						controls={false}
+					/>
+					<Pressable style={StyleSheet.absoluteFill} onPress={handleMuteToggle} />
+					{isMuted ? (
+						<View style={styles.unmuteOverlay}>
+							<ThemedText style={styles.unmuteText}>Click to unmute</ThemedText>
+						</View>
+					) : null}
+					{isLoading ? (
+						<View style={styles.loadingOverlay}>
+							<ActivityIndicator size="large" color={textColor} />
+						</View>
+					) : null}
+				</View>
+			</View>
+		)
+	}
+
 	return (
 		<View style={[styles.container, style]}>
 			<Pressable onPress={handleVideoPress} style={styles.videoWrapper}>
@@ -144,24 +201,10 @@ export function VideoPlayer({ videoUri, posterUri, style }: VideoPlayerProps) {
 					source={{ uri: videoUri }}
 					posterSource={posterUri ? { uri: posterUri } : { uri: videoUri }}
 					usePoster={true}
-					shouldPlay={false}
+					shouldPlay={true}
 					isMuted={isMuted}
 					resizeMode={ResizeMode.CONTAIN}
 					onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-					onFullscreenUpdate={(status) => {
-						// Handle full screen state changes
-						if (status.fullscreenUpdate === 1) {
-							// Entered full screen
-						} else if (status.fullscreenUpdate === 2) {
-							// Exited full screen - resume or stop based on user action
-							if (videoRef.current && status.status?.isLoaded) {
-								// Resume playback if it was playing before
-								if (status.status.isPlaying) {
-									videoRef.current.playAsync().catch(console.error)
-								}
-							}
-						}
-					}}
 					style={styles.video}
 				/>
 				{isLoading ? (
@@ -169,46 +212,12 @@ export function VideoPlayer({ videoUri, posterUri, style }: VideoPlayerProps) {
 						<ActivityIndicator size="large" color={textColor} />
 					</View>
 				) : null}
-				{(showControls || !isPlaying) && !isLoading ? (
-					<View style={styles.controlsOverlay}>
-						<Pressable
-							onPress={handlePlayPause}
-							style={styles.controlButton}
-							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-						>
-							<Ionicons
-								name={isPlaying ? 'pause' : 'play'}
-								size={32}
-								color="#fff"
-							/>
-						</Pressable>
+				{isMuted ? (
+					<View style={styles.unmuteOverlay}>
+						<ThemedText style={styles.unmuteText}>Tap to unmute</ThemedText>
 					</View>
 				) : null}
 			</Pressable>
-			{!isLoading ? (
-				<View style={styles.bottomControls}>
-					<Pressable
-						onPress={handleMuteToggle}
-						style={styles.controlButton}
-						hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-					>
-						<Ionicons
-							name={isMuted ? 'volume-mute' : 'volume-high'}
-							size={24}
-							color={textColor}
-						/>
-					</Pressable>
-					{Platform.OS !== 'web' ? (
-						<Pressable
-							onPress={handleFullScreen}
-							style={styles.controlButton}
-							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-						>
-							<Ionicons name="expand" size={24} color={textColor} />
-						</Pressable>
-					) : null}
-				</View>
-			) : null}
 		</View>
 	)
 }
@@ -240,31 +249,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 	},
-	controlsOverlay: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	controlButton: {
-		padding: 8,
-		borderRadius: 24,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-	},
-	bottomControls: {
-		position: 'absolute',
-		bottom: 0,
-		left: 0,
-		right: 0,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		padding: 12,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-	},
 	errorContainer: {
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -283,6 +267,21 @@ const styles = StyleSheet.create({
 	watchButtonText: {
 		color: '#fff',
 		fontSize: 16,
+		fontWeight: '600',
+	},
+	unmuteOverlay: {
+		position: 'absolute',
+		bottom: 24,
+		left: 0,
+		right: 0,
+		alignItems: 'center',
+	},
+	unmuteText: {
+		backgroundColor: 'rgba(0, 0, 0, 0.6)',
+		color: '#fff',
+		paddingVertical: 8,
+		paddingHorizontal: 16,
+		borderRadius: 16,
 		fontWeight: '600',
 	},
 })

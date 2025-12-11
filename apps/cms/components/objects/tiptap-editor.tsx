@@ -1,12 +1,13 @@
 'use client'
 
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEffect, useRef, useState } from 'react'
+import Image from '@tiptap/extension-image'
+import Placeholder from '@tiptap/extension-placeholder'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
-import Placeholder from '@tiptap/extension-placeholder'
-import { useEffect } from 'react'
+import { EditorContent, useEditor } from '@tiptap/react'
 
-import { Bold, Italic, Underline as UnderlineIcon, Heading1, Heading2, Heading3, List, ListOrdered } from "lucide-react"
+import { Bold, Heading1, Heading2, Heading3, Italic, List, ListOrdered, Underline as UnderlineIcon, Image as ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui"
 
 type TiptapEditorProps = {
@@ -14,7 +15,19 @@ type TiptapEditorProps = {
 	onChange: (value: object | null) => void
 	placeholder?: string
 	className?: string
+	uploadUrl?: string | null
 }
+
+const ImageWithMeta = Image.extend({
+	addAttributes() {
+		return {
+			...this.parent?.(),
+			r2Key: {
+				default: null,
+			},
+		}
+	},
+})
 
 function convertStringToTiptapJson(text: string): object {
 	return {
@@ -33,12 +46,19 @@ export function TiptapEditor({
 	onChange,
 	placeholder = 'Enter description...',
 	className,
+	uploadUrl,
 }: TiptapEditorProps) {
+	const [isUploading, setIsUploading] = useState(false)
+	const fileInputRef = useRef<HTMLInputElement | null>(null)
+
 	const editor = useEditor({
         immediatelyRender: false,
 		extensions: [
 			StarterKit,
 			Underline,
+			ImageWithMeta.configure({
+				inline: false,
+			}),
 			Placeholder.configure({
 				placeholder,
 			}),
@@ -47,7 +67,7 @@ export function TiptapEditor({
 		editorProps: {
 			attributes: {
 				class:
-					'min-h-[200px] w-full rounded-md px-3 py-2 border border-neutral-200 text-sm focus:border-neutral-300 focus:ring-1 focus:ring-accent/20 outline-none transition-colors prose prose-sm max-w-none',
+					'min-h-[220px] w-full rounded-lg px-3 py-3 border border-[rgba(var(--border),0.9)] bg-[rgb(var(--surface))] text-sm text-[rgb(var(--color-neutral-900))] shadow-sm outline-none transition duration-150 ease-out focus:border-[rgba(var(--ring),0.7)] focus:ring-2 focus:ring-[rgba(var(--ring),0.25)] prose prose-sm max-w-none',
 			},
 		},
 		onUpdate: ({ editor }) => {
@@ -83,16 +103,59 @@ export function TiptapEditor({
 
 	if (!editor) {
 		return (
-			<div className="min-h-[200px] w-full rounded-md px-3 py-2 border border-neutral-200 text-sm bg-neutral-50 flex items-center justify-center">
-				<span className="text-neutral-400">Loading editor...</span>
+			<div className="flex min-h-[220px] w-full items-center justify-center rounded-lg border border-[rgba(var(--border),0.9)] bg-[rgb(var(--surface-muted))] px-3 py-2 text-sm">
+				<span className="text-[rgb(var(--color-neutral-500))]">Loading editor...</span>
 			</div>
 		)
 	}
 
+	async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+		if (!uploadUrl) {
+			e.target.value = ''
+			return
+		}
+		const file = e.target.files?.[0]
+		if (!file) return
+		if (!editor) {
+			e.target.value = ''
+			return
+		}
+
+		setIsUploading(true)
+		try {
+			const formData = new FormData()
+			formData.append('file', file)
+			const res = await fetch(uploadUrl, {
+				method: 'POST',
+				body: formData,
+			})
+			if (!res.ok) {
+				throw new Error('Upload failed')
+			}
+			const data = (await res.json()) as { key: string; url: string }
+			editor
+				.chain()
+				.focus()
+				.setImage(
+					{
+						src: data.url,
+						r2Key: data.key,
+						alt: file.name,
+					} as any,
+				)
+				.run()
+		} catch (error) {
+			console.error('Image upload failed', error)
+		} finally {
+			setIsUploading(false)
+			e.target.value = ''
+		}
+	}
+
 	return (
 		<div className={className}>
-			<div className="border border-neutral-200 rounded-md focus-within:border-neutral-300 focus-within:ring-1 focus-within:ring-accent/20 transition-colors">
-				<div className="border-b border-neutral-200 p-2 flex gap-1 flex-wrap bg-neutral-50/50">
+			<div className="rounded-xl border border-[rgba(var(--border),0.9)] bg-[rgb(var(--surface))] shadow-sm transition focus-within:border-[rgba(var(--ring),0.7)] focus-within:ring-2 focus-within:ring-[rgba(var(--ring),0.2)]">
+				<div className="flex flex-wrap gap-1 border-b border-[rgba(var(--border),0.9)] bg-[rgb(var(--surface-muted))] p-2 backdrop-blur">
 					<Button
 						type="button"
 						onClick={() => editor.chain().focus().toggleBold().run()}
@@ -120,7 +183,7 @@ export function TiptapEditor({
 					>
 						<UnderlineIcon size={16} />
 					</Button>
-					<div className="w-px bg-neutral-200 mx-1" />
+					<div className="mx-1 h-6 w-px bg-[rgba(var(--border),0.9)]" />
 					<Button
 						type="button"
 						onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
@@ -148,7 +211,7 @@ export function TiptapEditor({
 					>
 						<Heading3 size={16} />
 					</Button>
-					<div className="w-px bg-neutral-200 mx-1" />
+					<div className="mx-1 h-6 w-px bg-[rgba(var(--border),0.9)]" />
 					<Button
 						type="button"
 						onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -167,6 +230,23 @@ export function TiptapEditor({
 					>
 						<ListOrdered size={16} />
 					</Button>
+					<Button
+						type="button"
+						onClick={() => fileInputRef.current?.click()}
+						variant={editor.isActive('image') ? "secondary-gray" : "ghost"}
+						size="icon"
+						className="h-8 w-8"
+						disabled={!uploadUrl || isUploading}
+					>
+						<ImageIcon size={16} />
+					</Button>
+					<input
+						type="file"
+						accept="image/*"
+						ref={fileInputRef}
+						className="hidden"
+						onChange={handleFileChange}
+					/>
 				</div>
 				<EditorContent editor={editor} />
 			</div>
